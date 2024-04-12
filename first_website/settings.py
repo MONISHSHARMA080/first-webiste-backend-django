@@ -34,13 +34,20 @@ SECRET_KEY = 'django-insecure-vx=&tyg22diyz5e-or9y2!35_lfnfynw7+h6f$frh6_ne#jg3g
 # DEBUG = os.getenv('DEBUG',False)
 DEBUG = True
 
-ALLOWED_HOSTS = ['social-network-monish.onrender.com' , '127.0.0.1']
-CORS_ALLOWED_ORIGINS = ['https://network-sigma.vercel.app','http://localhost:5173']
+# ALLOWED_HOSTS = ['social-network-monish.onrender.com' , '127.0.0.1']
+ALLOWED_HOSTS = ['*']
+CORS_ALLOWED_ORIGINS = ['*']
+# CORS_ALLOWED_ORIGINS = ['https://network-sigma.vercel.app','http://localhost:5173']
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    #     'rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication',
+    #     'rest_framework.authentication.TokenAuthentication',
+    # ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
+    ),
    
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
@@ -48,7 +55,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_THROTTLE_RATES': {
         'anon': '8/minute',
-        'user': '1000/day',
+        'user': '700/minutes',
     },
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
@@ -58,7 +65,7 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=2),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=40),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=32),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
@@ -86,8 +93,8 @@ SIMPLE_JWT = {
     "JTI_CLAIM": "jti",
 
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=40),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=32),
 
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
     "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
@@ -96,9 +103,6 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
-
-
-
 
 
 INSTALLED_APPS = [

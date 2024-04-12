@@ -11,7 +11,12 @@ from django.core.mail import send_mail
 from first_website.settings import EMAIL_HOST_USER
 from django.utils import timezone
 
-
+# ---temp
+class View_all_users_serializer(serializers.ModelSerializer):
+    class Meta:
+        model = User_in_app
+        fields = ['id', 'email', 'username', 'registered_date']  # Add other fields as needed
+# ---temp
 class verify_user_through_otp(serializers.ModelSerializer):
     otp = serializers.IntegerField(write_only=True,) 
 

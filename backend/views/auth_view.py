@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from backend.models import User_in_app
@@ -10,6 +11,93 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.response import Response
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
+
+
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from backend.serializers import View_all_users_serializer
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework import permissions
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+class IsTokenValid(permissions.BasePermission):
+    def has_permission(self, request, view):
+        auth = JWTAuthentication()
+        try:
+            auth_header = JWTAuthentication.get_header(request)
+            if auth_header is None:
+                return False
+            auth_data = auth.get_validated_token(auth_header)
+            return True
+        except InvalidToken:
+            return False
+
+
+
+# @api_view(['GET'])
+def view_all_users(request):
+    users = User_in_app.objects.all()
+    serializer = View_all_users_serializer(users, many=True)
+    jwt_authentication = JWTAuthentication()
+    token = jwt_authentication.authenticate(request)
+    print("in serilizer-----" , "-----",token)
+    return JsonResponse({"mm":serializer.data})
+
+######################----------##################
+
+""" API FOR  UPDATING DELEATING AND UPDATING PROFILE IS NOT BEING MADE AS WE DON'T NEED THAT  """
+
+######################----------##################
+
+#--------Djnago jwt(simple)
+
+# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+#     @classmethod
+#     def get_token(cls, user):
+#         token = super().get_token(user)
+
+#         # Add custom claims
+#         token['username'] = user.username
+#         # ...
+
+#         return token
+
+# class MyTokenObtainPairView(TokenObtainPairView):
+#     serializer_class = MyTokenObtainPairSerializer
+
+
+# def get_tokens_for_user(user):
+#     refresh = RefreshToken.for_user(user)
+
+#     return {
+#         'refresh': str(refresh),
+#         'access': str(refresh.access_token),
+#     }
+# #--------Djnago jwt(simple)
+
+
+# # ---using this in my view
+# # class RegisterView(APIView):
+# #     def post(self, request):
+# #         serializer = UserRegistrationSerializer(data=request.data)
+# #         if not serializer.is_valid():
+# #             return Response({'statue' : 403, 'errors':serializer.errors, 'message':'something went wrong' })
+        
+# #         serializer.save()
+# #         user = User.objects.get(username=serializer.data['username'])
+# #         refresh = RefreshToken.for_user(user)
+# #         refresh['username'] = user.username
+
+# #         return Response({'statue' : 200,  'refresh':str(refresh), 'access':str(refresh.access_token) })
+
 
 class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
     
@@ -37,6 +125,14 @@ class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
             'access': str(token_data.access_token),
         }
         print(tokens,"BBbBBbbbBB")
+        refresh = RefreshToken.for_user(user_instance)
+        refresh['username'] = user_instance.username
+        print("-----------------")
+        print("-----------------")
+        print({'statue' : 200,  'refresh':str(refresh), 'access':str(refresh.access_token) })
+        print("-----------------")
+        print("-----------------")
+        # return Response({'statue' : 200,  'refresh':str(refresh), 'access':str(refresh.access_token) })
         return Response(response_returned_by_serilizer_to_return_to_the_user)    
 
 class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMixin, mixins.RetrieveModelMixin,):
