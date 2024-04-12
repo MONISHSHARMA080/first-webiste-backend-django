@@ -22,8 +22,7 @@ class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
             
         response_returned_by_serilizer_to_return_to_the_user = serializer.save()
         print(response_returned_by_serilizer_to_return_to_the_user,"---------------Response---")
-        print("email",a['user']['email'])
-        user_instance = User_in_app.objects.get(email=a['user']['email'])
+        user_instance = User_in_app.objects.get(email=response_returned_by_serilizer_to_return_to_the_user['user']['email'])
         print("::::::::::::::;;;;;:::::",user_instance)
         refresh = RefreshToken.for_user(user_instance)
         print(refresh,"llllll")
