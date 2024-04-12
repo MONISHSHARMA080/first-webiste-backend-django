@@ -119,7 +119,7 @@ class Email_signup_usewr_serializer(serializers.ModelSerializer):
         
         send_user_email(otp, validated_data.get('email'), validated_data.get('username'))
 
-        return {"status":200,"message":validated_data,"check_email_for_otp":True}
+        return {"status":200,"user":validated_data,"check_email_for_otp":True}
         
 class Spotify_signup_user_serializer(serializers.ModelSerializer):
     id_token = serializers.CharField(write_only=True,max_length=None, min_length=10, allow_blank=False, trim_whitespace=True) 
@@ -207,11 +207,13 @@ def return_already_existing_user_from_db_in_IntegrityError_of_unique_field(valid
     existing_user = User_in_app.objects.get(email=validated_data['email'])
     return {
                 "status": 200,
+                "user":{
                 "profile_picture_url": existing_user.profile_picture_url,
                 "email_verified": existing_user.email_verified,
                 "verified_through_auth_provider": existing_user.verified_through_auth_provider,
                 "email": existing_user.email,
                 "name": existing_user.username
+                }
             }
     
 def send_user_email(otp, user_email, user_name):

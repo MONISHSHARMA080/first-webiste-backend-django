@@ -6,6 +6,39 @@ from rest_framework import mixins
 from rest_framework import generics
 from .views import verify_google_token
 from rest_framework import status
+# ---jwt---
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.response import Response
+
+class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
+    
+    queryset = User_in_app.objects.all()
+    serializer_class = Email_signup_usewr_serializer
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data )
+        if not serializer.is_valid():
+            return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST)
+            
+        response_returned_by_serilizer_to_return_to_the_user = serializer.save()
+        print(response_returned_by_serilizer_to_return_to_the_user,"---------------Response---")
+        print("email",a['user']['email'])
+        user_instance = User_in_app.objects.get(email=a['user']['email'])
+        print("::::::::::::::;;;;;:::::",user_instance)
+        refresh = RefreshToken.for_user(user_instance)
+        print(refresh,"llllll")
+        
+        token_serializer = TokenObtainPairSerializer()
+        print(token_serializer,"gggggg")
+        
+        token_data = token_serializer.get_token(user_instance)
+        print(token_data,"aaaaaaAAAAAAAAAAAAA")
+        tokens = {
+            'refresh': str(refresh),
+            'access': str(token_data.access_token),
+        }
+        print(tokens,"BBbBBbbbBB")
+        return Response(response_returned_by_serilizer_to_return_to_the_user)    
 
 class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMixin, mixins.RetrieveModelMixin,):
     queryset = User_in_app.objects.all()
@@ -33,20 +66,6 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
         users.delete()
         return Response( status=204)
     
-    
-class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
-    
-    queryset = User_in_app.objects.all()
-    serializer_class = Email_signup_usewr_serializer
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data )
-        if not serializer.is_valid():
-            return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST)
-            
-        a = serializer.save()
-        print(a,"----")
-        
-        return Response(a)    
     
  
     

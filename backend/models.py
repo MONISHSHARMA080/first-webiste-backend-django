@@ -22,22 +22,9 @@ class User_in_app(AbstractUser):
     user_permissions = models.ManyToManyField(Permission, related_name='magical_website_user_permissions')
     
     
-    
-    
-    # def save(self, *args, **kwargs):
-    #     # Check if the user is verified through the auth provider
-    #     # Allow saving if the user is verified through the auth provider
-    #     print("kkk->",self.email_verified,"jjj->", self.password )
-    #     if self.password is None:
-    #         if self.email_verified == True:
-    #             print("worked))))))))))))00)0))00")
-    #             super().save(*args, **kwargs)
-    #     elif self.password is  not None:
-    #         print("Cannot create user with null password and unverified through auth provider")
-    
-    #         super().save(*args, **kwargs)
+   
 
     
-    def __str__(self):
-        return f"{self.name}"
+    # def __str__(self):
+    #     return f"{self.username}"
     
