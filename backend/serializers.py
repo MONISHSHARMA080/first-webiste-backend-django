@@ -122,7 +122,7 @@ class Email_signup_usewr_serializer(serializers.ModelSerializer):
                     return return_already_existing_user_from_db_in_IntegrityError_of_unique_field(validated_data) 
         validated_data.pop('password')
         
-        send_user_email(otp, validated_data.get('email'), validated_data.get('username'))
+        # send_user_email(otp, validated_data.get('email'), validated_data.get('username'))
 
         return {"status":200,"user":validated_data,"check_email_for_otp":True}
         

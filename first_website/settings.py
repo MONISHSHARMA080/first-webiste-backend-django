@@ -22,7 +22,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-
+AUTH_USER_MODEL = "backend.User_in_app"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -54,7 +54,7 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '8/minute',
+        'anon': '30/minute',
         'user': '700/minutes',
     },
     'DEFAULT_RENDERER_CLASSES': [

@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-import time
+
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -28,8 +28,20 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework.exceptions import AuthenticationFailed
 
+# class IsTokenValid(permissions.BasePermission):
+#     def has_permission(self, request, view):
+#         auth = JWTAuthentication()
+#         try:
+#             auth_header = JWTAuthentication.get_header(request)
+#             if auth_header is None:
+#                 return False
+#             auth_data = auth.get_validated_token(auth_header)
+#             return True
+#         except InvalidToken:
+#             return False
 
-
+@permission_classes([IsAuthenticated])
+# this is not a class
 def view_all_users(request):
     users = User_in_app.objects.all()
     serializer = View_all_users_serializer(users, many=True)
@@ -50,54 +62,6 @@ def view_all_users(request):
         # User is not authenticated
         print("Authentication failed:", e)
         return JsonResponse({"error": "Authentication failed"}, status=401)
-
-######################----------##################
-
-""" API FOR  UPDATING DELEATING AND UPDATING PROFILE IS NOT BEING MADE AS WE DON'T NEED THAT  """
-
-######################----------##################
-
-#--------Djnago jwt(simple)
-
-# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-#     @classmethod
-#     def get_token(cls, user):
-#         token = super().get_token(user)
-
-#         # Add custom claims
-#         token['username'] = user.username
-#         # ...
-
-#         return token
-
-# class MyTokenObtainPairView(TokenObtainPairView):
-#     serializer_class = MyTokenObtainPairSerializer
-
-
-# def get_tokens_for_user(user):
-#     refresh = RefreshToken.for_user(user)
-
-#     return {
-#         'refresh': str(refresh),
-#         'access': str(refresh.access_token),
-#     }
-# #--------Djnago jwt(simple)
-
-
-# # ---using this in my view
-# # class RegisterView(APIView):
-# #     def post(self, request):
-# #         serializer = UserRegistrationSerializer(data=request.data)
-# #         if not serializer.is_valid():
-# #             return Response({'statue' : 403, 'errors':serializer.errors, 'message':'something went wrong' })
-        
-# #         serializer.save()
-# #         user = User.objects.get(username=serializer.data['username'])
-# #         refresh = RefreshToken.for_user(user)
-# #         refresh['username'] = user.username
-
-# #         return Response({'statue' : 200,  'refresh':str(refresh), 'access':str(refresh.access_token) })
-
 
 class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
     
@@ -135,9 +99,12 @@ class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
         # return Response({'statue' : 200,  'refresh':str(refresh), 'access':str(refresh.access_token) })
         return Response(response_returned_by_serilizer_to_return_to_the_user)    
 
+# @permission_classes([IsAuthenticated])
 class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMixin, mixins.RetrieveModelMixin,):
     queryset = User_in_app.objects.all()
     serializer_class = user_serializer
+    permission_classes = [IsAuthenticated]
+    # authentication_classes=[JWTAuthentication]
     
     def post(self, request, *args, **kwargs):
 
@@ -145,18 +112,21 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
         if not serializer.is_valid():
             return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST)            
         a = serializer.save()
-        print(a,"----")
+        # a["tokens"] = 
+        user = User_in_app.objects.get(email=a.get('user').get('email'))
+        refresh = RefreshToken.for_user(user)
+        a["tokens"] = {
+            "access": str(refresh.access_token),
+            "refresh": str(refresh)
+        }
+        print(a,"----00",refresh)
         
         return Response(a)
     
     def get(self, request, *args, **kwargs):
         print("hh---")
-        start_time = time.time()  # Get the current time before making the database query
-        users = self.get_queryset()
+        users = User_in_app.objects.all()
         serializer = View_all_users_serializer(users, many=True)
-        end_time = time.time()  # Get the current time after the query completes
-        time_taken = end_time - start_time  # Calculate the time taken for the query
-        print("Time taken to retrieve data from the database:", time_taken, "seconds")
         return Response(serializer.data)
 
     
