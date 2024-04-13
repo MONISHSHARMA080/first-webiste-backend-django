@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-
+import time
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -151,8 +151,12 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
     
     def get(self, request, *args, **kwargs):
         print("hh---")
-        users = User_in_app.objects.all()
+        start_time = time.time()  # Get the current time before making the database query
+        users = self.get_queryset()
         serializer = View_all_users_serializer(users, many=True)
+        end_time = time.time()  # Get the current time after the query completes
+        time_taken = end_time - start_time  # Calculate the time taken for the query
+        print("Time taken to retrieve data from the database:", time_taken, "seconds")
         return Response(serializer.data)
 
     

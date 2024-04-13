@@ -5,6 +5,13 @@ from django.core.exceptions import ValidationError
 
 
 class User_in_app(AbstractUser):
+    class Meta:
+        indexes = [
+            models.Index(fields=['registered_date', 'email', 'username']),
+            models.Index(fields=['email_verified','verified_through_auth_provider']),
+            models.Index(fields=['otp','otp_created_at']),
+            models.Index(fields=['profile_picture_url','password']),
+        ]
     registered_date = models.DateTimeField(auto_now_add=True)
     
     profile_picture_url = models.URLField(null=True, blank=True)
@@ -17,7 +24,7 @@ class User_in_app(AbstractUser):
     
     otp = models.IntegerField( null=True, blank=True,)
     otp_created_at = models.DateTimeField(null=True, blank=True)
-    
+    # ----try to remove them as don't need them
     groups = models.ManyToManyField(Group, related_name='magical_website_users')
     user_permissions = models.ManyToManyField(Permission, related_name='magical_website_user_permissions')
     
