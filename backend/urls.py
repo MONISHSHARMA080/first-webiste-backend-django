@@ -5,7 +5,8 @@ from .views import auth_view
 from rest_framework_simplejwt.views import (
     TokenObtainSlidingView,
     TokenRefreshSlidingView,
-    TokenVerifyView
+    TokenVerifyView,
+    token_refresh
 )
 
 
@@ -13,7 +14,7 @@ urlpatterns = [
     
     path('api/token/', TokenObtainSlidingView.as_view(), name='token_obtain'),
     path('api/token/verify', TokenVerifyView.as_view(), name='token_obtain'),
-    path('api/token/refresh/', TokenRefreshSlidingView.as_view(), name='token_refresh'),
+    path('api/token/refresh/', token_refresh, name='token_refresh'),
     path('', auth_view.view_all_users, name='token_refresh'),
 
     

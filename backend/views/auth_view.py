@@ -26,30 +26,30 @@ from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework import permissions
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken
-from rest_framework_simplejwt.authentication import JWTAuthentication
-
-class IsTokenValid(permissions.BasePermission):
-    def has_permission(self, request, view):
-        auth = JWTAuthentication()
-        try:
-            auth_header = JWTAuthentication.get_header(request)
-            if auth_header is None:
-                return False
-            auth_data = auth.get_validated_token(auth_header)
-            return True
-        except InvalidToken:
-            return False
+from rest_framework.exceptions import AuthenticationFailed
 
 
 
-# @api_view(['GET'])
 def view_all_users(request):
     users = User_in_app.objects.all()
     serializer = View_all_users_serializer(users, many=True)
+    
     jwt_authentication = JWTAuthentication()
-    token = jwt_authentication.authenticate(request)
-    print("in serilizer-----" , "-----",token)
-    return JsonResponse({"mm":serializer.data})
+    token = jwt_authentication.authenticate_header(request)
+    print("User:", "Token:", token)
+    try:
+        jwt_authentication = JWTAuthentication()
+        token = jwt_authentication.authenticate_header(request)
+        print("User:", "Token:", token)
+        # token = jwt_authentication.authenticate_header(request)
+        # aaa = jwt_authentication.get_user(jwt_authentication.get_validated_token(request))
+        # print("User:",aaa, "     ", "Token:", token)
+        # User is authenticated, continue with your logic here
+        return JsonResponse({"mm":serializer.data})
+    except AuthenticationFailed as e:
+        # User is not authenticated
+        print("Authentication failed:", e)
+        return JsonResponse({"error": "Authentication failed"}, status=401)
 
 ######################----------##################
 
@@ -112,19 +112,19 @@ class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
         print(response_returned_by_serilizer_to_return_to_the_user,"---------------Response---")
         user_instance = User_in_app.objects.get(email=response_returned_by_serilizer_to_return_to_the_user['user']['email'])
         print("::::::::::::::;;;;;:::::",user_instance)
-        refresh = RefreshToken.for_user(user_instance)
-        print(refresh,"llllll")
+        # refresh = RefreshToken.for_user(user_instance)
+        # print(refresh,"llllll")
         
-        token_serializer = TokenObtainPairSerializer()
-        print(token_serializer,"gggggg")
+        # token_serializer = TokenObtainPairSerializer()
+        # print(token_serializer,"gggggg")
         
-        token_data = token_serializer.get_token(user_instance)
-        print(token_data,"aaaaaaAAAAAAAAAAAAA")
-        tokens = {
-            'refresh': str(refresh),
-            'access': str(token_data.access_token),
-        }
-        print(tokens,"BBbBBbbbBB")
+        # token_data = token_serializer.get_token(user_instance)
+        # print(token_data,"aaaaaaAAAAAAAAAAAAA")
+        # tokens = {
+        #     'refresh': str(refresh),
+        #     'access': str(token_data.access_token),
+        # }
+        # print(tokens,"BBbBBbbbBB")
         refresh = RefreshToken.for_user(user_instance)
         refresh['username'] = user_instance.username
         print("-----------------")
