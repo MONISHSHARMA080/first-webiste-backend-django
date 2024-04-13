@@ -7,14 +7,19 @@ from django.core.exceptions import ValidationError
 class User_in_app(AbstractUser):
     class Meta:
         indexes = [
-            models.Index(fields=['registered_date', 'email', 'username']),
-            models.Index(fields=['email_verified','verified_through_auth_provider']),
-            models.Index(fields=['otp','otp_created_at']),
-            models.Index(fields=['profile_picture_url','password']),
+            models.Index(fields=['email']),
+            models.Index(fields=['username']),
+            models.Index(fields=['registered_date']),
+            models.Index(fields=['verified_through_auth_provider']),
+            models.Index(fields=['email_verified']),
+            models.Index(fields=['otp_created_at']),
+            models.Index(fields=['otp']),
+            models.Index(fields=['profile_picture_url']),
+            models.Index(fields=['password']),
         ]
     registered_date = models.DateTimeField(auto_now_add=True)
     
-    profile_picture_url = models.URLField(null=True, blank=True)
+    profile_picture_url = models.URLField(null=True, blank=True,db_index=True)
     email_verified = models.BooleanField(null=False, blank=False, default=False)
     verified_through_auth_provider = models.BooleanField(null=False, blank=False, default=False)
     email = models.EmailField(null=False,blank=False,unique=True)
