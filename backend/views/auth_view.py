@@ -42,33 +42,6 @@ class user_login_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
                 "access": str(refresh.access_token),
                 "refresh": str(refresh)
             }
-        
-        
-        
-        # response_returned_by_serilizer_to_return_to_the_user = serializer.save()
-        # print(response_returned_by_serilizer_to_return_to_the_user,"---------------Response---")
-        # user_instance = User_in_app.objects.get(email=response_returned_by_serilizer_to_return_to_the_user['user']['email'])
-        # print("::::::::::::::;;;;;:::::",user_instance)
-        # refresh = RefreshToken.for_user(user_instance)
-        # print(refresh,"llllll")
-        
-        # token_serializer = TokenObtainPairSerializer()
-        # print(token_serializer,"gggggg")
-        
-        # token_data = token_serializer.get_token(user_instance)
-        # print(token_data,"aaaaaaAAAAAAAAAAAAA")
-        # tokens = {
-        #     'refresh': str(refresh),
-        #     'access': str(token_data.access_token),
-        # }
-        # print(tokens,"BBbBBbbbBB")
-        # refresh = RefreshToken.for_user(user_instance)
-        # print("-----------------")
-        # print("-----------------")
-        # print({'statue' : 200,  'refresh':str(refresh), 'access':str(refresh.access_token) })
-        # print("-----------------")
-        # print("-----------------")
-        # return Response({'statue' : 200,  'refresh':str(refresh), 'access':str(refresh.access_token) })
         return Response(response_to_return)    
     
 class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):

@@ -101,7 +101,7 @@ class View_all_users_serializer(serializers.ModelSerializer):
     class Meta:
         model = User_in_app
         # fields = '__all__'
-        exclude = ['groups','user_permissions','otp','otp_created_at','is_active','is_staff','first_name','last_name','is_superuser','last_login','date_joined']
+        exclude = ['groups','user_permissions','otp_created_at','is_active','is_staff','first_name','last_name','is_superuser','last_login','date_joined']
         
 class Email_login_user_serializer(serializers.ModelSerializer):
     class Meta:
