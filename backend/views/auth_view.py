@@ -28,41 +28,6 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework.exceptions import AuthenticationFailed
 
-# class IsTokenValid(permissions.BasePermission):
-#     def has_permission(self, request, view):
-#         auth = JWTAuthentication()
-#         try:
-#             auth_header = JWTAuthentication.get_header(request)
-#             if auth_header is None:
-#                 return False
-#             auth_data = auth.get_validated_token(auth_header)
-#             return True
-#         except InvalidToken:
-#             return False
-
-@permission_classes([IsAuthenticated])
-# this is not a class
-def view_all_users(request):
-    users = User_in_app.objects.all()
-    serializer = View_all_users_serializer(users, many=True)
-    
-    jwt_authentication = JWTAuthentication()
-    token = jwt_authentication.authenticate_header(request)
-    print("User:", "Token:", token)
-    try:
-        jwt_authentication = JWTAuthentication()
-        token = jwt_authentication.authenticate_header(request)
-        print("User:", "Token:", token)
-        # token = jwt_authentication.authenticate_header(request)
-        # aaa = jwt_authentication.get_user(jwt_authentication.get_validated_token(request))
-        # print("User:",aaa, "     ", "Token:", token)
-        # User is authenticated, continue with your logic here
-        return JsonResponse({"mm":serializer.data})
-    except AuthenticationFailed as e:
-        # User is not authenticated
-        print("Authentication failed:", e)
-        return JsonResponse({"error": "Authentication failed"}, status=401)
-
 class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
     
     queryset = User_in_app.objects.all()
