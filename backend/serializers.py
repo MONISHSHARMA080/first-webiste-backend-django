@@ -32,7 +32,13 @@ class verify_user_through_otp(serializers.ModelSerializer):
         except User_in_app.DoesNotExist:
                 return {"status":status.HTTP_404_NOT_FOUND,"message":validated_data}
         if user.email_verified == True:
-                ...
+            validated_data.pop('otp')
+            validated_data['profile_picture_url'] = user.profile_picture_url 
+            validated_data['email_verified'] = user.email_verified 
+            validated_data['verified_through_auth_provider'] = user.verified_through_auth_provider 
+            validated_data['username'] = user.username 
+            return {"status": status.HTTP_201_CREATED, "message_to_display_user": "Your email has been verified , welcome onboard","message":"You are now verified","user":validated_data}
+
         if user.otp == otp:
             if user.otp_created_at and timezone.now() - user.otp_created_at <= timezone.timedelta(hours=2):
                 user.email_verified = True
@@ -179,7 +185,7 @@ class Spotify_signup_user_serializer(serializers.ModelSerializer):
                 if images:
                     validated_data['profile_picture_url'] = images[0].get('url')
                 else:
-                    validated_data['profile_picture_url'] = ""
+                    validated_data['profile_picture_url'] = None
                 return {"status":status_code_to_send_in_response,"message_to_display_user": "Your email has been verified , welcome onboard","message":"You are now verified","user":validated_data }
             else:
                 return {"status":response.status_code,"message_to_display_user": "We can't verify you ,Please retry or try a different auth provider  ","message":"error during spotify api depth 2","user":validated_data} 

@@ -1,5 +1,3 @@
-from django.http import JsonResponse
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from backend.models import User_in_app
 from backend.serializers import Email_signup_usewr_serializer, Spotify_signup_user_serializer, View_all_users_serializer, user_serializer,verify_user_through_otp
@@ -9,24 +7,12 @@ from .views import verify_google_token
 from rest_framework import status
 # ---jwt---
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.response import Response
 
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.tokens import RefreshToken
 
-
-
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from backend.serializers import View_all_users_serializer
-from rest_framework.decorators import api_view, renderer_classes
-from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
-from rest_framework import permissions
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.exceptions import InvalidToken
-from rest_framework.exceptions import AuthenticationFailed
 
 class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
     
@@ -55,7 +41,6 @@ class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
         # }
         # print(tokens,"BBbBBbbbBB")
         refresh = RefreshToken.for_user(user_instance)
-        refresh['username'] = user_instance.username
         print("-----------------")
         print("-----------------")
         print({'statue' : 200,  'refresh':str(refresh), 'access':str(refresh.access_token) })
@@ -64,7 +49,6 @@ class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
         # return Response({'statue' : 200,  'refresh':str(refresh), 'access':str(refresh.access_token) })
         return Response(response_returned_by_serilizer_to_return_to_the_user)    
 
-# @permission_classes([IsAuthenticated])
 class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMixin, mixins.RetrieveModelMixin,):
     queryset = User_in_app.objects.all()
     serializer_class = user_serializer
@@ -76,17 +60,12 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
         serializer = self.get_serializer(data=request.data )
         if not serializer.is_valid():
             return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST)            
-        a = serializer.save()
-        # a["tokens"] = 
-        user = User_in_app.objects.get(email=a.get('user').get('email'))
-        refresh = RefreshToken.for_user(user)
-        a["tokens"] = {
-            "access": str(refresh.access_token),
-            "refresh": str(refresh)
-        }
-        print(a,"----00",refresh)
+        serializer_response = serializer.save()
+        add_JWT_token_for_user_in_response_from_serializer(serializer_response)
         
-        return Response(a)
+        print(serializer_response,"----00")
+        
+        return Response(serializer_response)
     
     def get(self, request, *args, **kwargs):
         print("hh---")
@@ -114,7 +93,7 @@ class user_signup_by_spotify(mixins.CreateModelMixin, generics.GenericAPIView):
             return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST) 
         response_from_create_func_in_serilizer  = serializer.save()
         print(response_from_create_func_in_serilizer,"----from spotify serilizer")
-        
+        response_from_create_func_in_serilizer = add_JWT_token_for_user_in_response_from_serializer(response_from_create_func_in_serilizer)
         return Response(response_from_create_func_in_serilizer) 
     
 class verify_user_through_otp(mixins.CreateModelMixin, generics.GenericAPIView):
@@ -131,8 +110,9 @@ class verify_user_through_otp(mixins.CreateModelMixin, generics.GenericAPIView):
         
         serializer = self.get_serializer(user, data=request.data)
         if serializer.is_valid():
-            a = serializer.update(user, serializer.validated_data)
-            return Response(a)
+            serializer_response = serializer.update(user, serializer.validated_data)
+            serializer_response = add_JWT_token_for_user_in_response_from_serializer(serializer_response)
+            return Response(serializer_response)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
        
@@ -147,8 +127,20 @@ def verify_google_token_view(request_object):
         
         if not id_token_from_frontend:
             return { "message": "Bad request: id_token is missing", "status" : 400}
-
         # Calling the verify_google_token function
         id_info = verify_google_token(id_token_from_frontend)
-        
         return  id_info
+    
+def add_JWT_token_for_user_in_response_from_serializer(serializer_response):
+    """also adding check , if resp. from seri. is 200 do  if else return the object itself """
+    
+    if serializer_response.get('status') == 200 or serializer_response.get('status') == 201 :
+        user = User_in_app.objects.get(email=serializer_response.get('user').get('email'))
+        refresh = RefreshToken.for_user(user)
+        serializer_response["tokens"] = {
+                "access": str(refresh.access_token),
+                "refresh": str(refresh)
+            }
+        return serializer_response
+    else:
+        return serializer_response
