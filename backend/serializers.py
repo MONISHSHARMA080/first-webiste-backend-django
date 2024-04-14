@@ -103,6 +103,38 @@ class View_all_users_serializer(serializers.ModelSerializer):
         # fields = '__all__'
         exclude = ['groups','user_permissions','otp','otp_created_at','is_active','is_staff','first_name','last_name','is_superuser','last_login','date_joined']
         
+class Email_login_user_serializer(serializers.ModelSerializer):
+    class Meta:
+        model = User_in_app
+        fields = ['email','password']
+        # exclude = ['groups','user_permissions' , 'verified_through_auth_provider','email_verified','registered_date','otp','otp_created_at','last_name','first_name',]
+            
+    
+    # def create(self, validated_data):
+    #     # when if we have validated data just take it and just  hash the password(add salt)  before storing it
+    #     validated_data['password'] =  make_password(validated_data.get('password'))
+    #     totp = pyotp.TOTP(pyotp.random_base32())
+    #     otp = totp.now()
+    #     validated_data['otp'] =  otp
+    #     validated_data['otp_created_at'] = timezone.now()
+    #     validated_data['verified_through_auth_provider'] = False
+    #     validated_data['email_verified'] = False
+        
+    #     # setting the email verified to be false by default here --not as it is set by defalut
+    #     try :
+    #         super().create(validated_data)
+    #     except IntegrityError as e: 
+    #             if 'UNIQUE constraint' in str(e):
+    #                 # if the user already exists just return it from there 
+    #                 return return_already_existing_user_from_db_in_IntegrityError_of_unique_field(validated_data) 
+    #     validated_data.pop('password')
+    #     validated_data.pop('otp')
+    #     validated_data.pop('otp_created_at')
+        
+    #     send_user_email(otp, validated_data.get('email'), validated_data.get('username'))
+
+    #     return {"status":200,"user":validated_data,"check_email_for_otp":True}
+    
 class Email_signup_usewr_serializer(serializers.ModelSerializer):
     class Meta:
         model = User_in_app

@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from backend.models import User_in_app
-from backend.serializers import Email_signup_usewr_serializer, Spotify_signup_user_serializer, View_all_users_serializer, user_serializer,verify_user_through_otp
+from backend.serializers import *
+# from backend.serializers import Email_login_user_serializer, Email_signup_usewr_serializer, Spotify_signup_user_serializer, View_all_users_serializer, user_serializer,verify_user_through_otp
 from rest_framework import mixins
 from rest_framework import generics
 from .views import verify_google_token
@@ -9,11 +10,67 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 
-
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from backend.serializers import View_all_users_serializer
+from django.contrib.auth.hashers import check_password
 
+class user_login_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
+    
+    queryset = User_in_app.objects.all()
+    serializer_class = Email_login_user_serializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data )
+        if not serializer.is_valid():
+            ...
+            # don't do anything as we know that user is in the db and 
+            # return Response(  serializer.errors ,status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = User_in_app.objects.get(email=serializer.data.get('email'))
+        except ObjectDoesNotExist:
+            return Response({"status":status.HTTP_404_NOT_FOUND, "message_to_display_user":"Email you enter was invalid","message":"user not found"})
+        
+        # check_password returns true or false
+        if not check_password(serializer.data.get('password'),user.password):
+            return Response({"status":status.HTTP_401_UNAUTHORIZED, "message_to_display_user":"Invalid auth credientials provided","message":"credientials provided is not valid"})
+        response_to_return = {"status":status.HTTP_200_OK,"message_to_display_user":"Login successfull ! welcome"}
+        # making the jwt token for the user
+        refresh = RefreshToken.for_user(user)
+        response_to_return["tokens"] = {
+                "access": str(refresh.access_token),
+                "refresh": str(refresh)
+            }
+        
+        
+        
+        # response_returned_by_serilizer_to_return_to_the_user = serializer.save()
+        # print(response_returned_by_serilizer_to_return_to_the_user,"---------------Response---")
+        # user_instance = User_in_app.objects.get(email=response_returned_by_serilizer_to_return_to_the_user['user']['email'])
+        # print("::::::::::::::;;;;;:::::",user_instance)
+        # refresh = RefreshToken.for_user(user_instance)
+        # print(refresh,"llllll")
+        
+        # token_serializer = TokenObtainPairSerializer()
+        # print(token_serializer,"gggggg")
+        
+        # token_data = token_serializer.get_token(user_instance)
+        # print(token_data,"aaaaaaAAAAAAAAAAAAA")
+        # tokens = {
+        #     'refresh': str(refresh),
+        #     'access': str(token_data.access_token),
+        # }
+        # print(tokens,"BBbBBbbbBB")
+        # refresh = RefreshToken.for_user(user_instance)
+        # print("-----------------")
+        # print("-----------------")
+        # print({'statue' : 200,  'refresh':str(refresh), 'access':str(refresh.access_token) })
+        # print("-----------------")
+        # print("-----------------")
+        # return Response({'statue' : 200,  'refresh':str(refresh), 'access':str(refresh.access_token) })
+        return Response(response_to_return)    
+    
 class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
     
     queryset = User_in_app.objects.all()
@@ -52,7 +109,7 @@ class user_signup_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
 class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMixin, mixins.RetrieveModelMixin,):
     queryset = User_in_app.objects.all()
     serializer_class = user_serializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     # authentication_classes=[JWTAuthentication]
     
     def post(self, request, *args, **kwargs):
@@ -132,6 +189,7 @@ def verify_google_token_view(request_object):
         return  id_info
     
 def add_JWT_token_for_user_in_response_from_serializer(serializer_response):
+    
     """also adding check , if resp. from seri. is 200 do  if else return the object itself """
     
     if serializer_response.get('status') == 200 or serializer_response.get('status') == 201 :
