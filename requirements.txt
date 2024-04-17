@@ -14,3 +14,4 @@ groq
 google-cloud-aiplatform
 google-auth
 pyotp
+psycopg2
