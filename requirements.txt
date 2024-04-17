@@ -14,4 +14,4 @@ groq
 google-cloud-aiplatform
 google-auth
 pyotp
-psycopg2
+psycopg2==2.9.2
