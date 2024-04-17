@@ -1,4 +1,5 @@
-Django==5.0.4
+# Django==5.0.4
+Django== 4.2.11
 django-allauth==0.57.0
 Django-oauth-toolkit==2.3.0
 Django-rest-framework==0.1.0
