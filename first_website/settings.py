@@ -59,7 +59,7 @@ REST_FRAMEWORK = {
     },
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer', # remove this if you want to remove api doc in prod
+        # 'rest_framework.renderers.BrowsableAPIRenderer', # remove this if you want to remove api doc in prod
     ]
 }
 
