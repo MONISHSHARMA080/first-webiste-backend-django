@@ -179,7 +179,7 @@ class Spotify_signup_user_serializer(serializers.ModelSerializer):
         # when if we have validated data just take it and just  hash the password(add salt)  before storing it
         code = validated_data.pop('id_token')
         
-        redirect_uri = 'magicalfirstwebsite://redirect'
+        redirect_uri = 'magicalfirstwebsite://'
         
         grant_type = 'authorization_code'
         client_id =  '812c827d57b44b2497941ccb210ae022'
