@@ -86,13 +86,16 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
     # authentication_classes=[JWTAuthentication]
     
     def post(self, request, *args, **kwargs):
-
+        print("\n\n in the function before getting started \n\n")
         serializer = self.get_serializer(data=request.data )
         if not serializer.is_valid():
-            return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST)            
+            print("\n\n serilizer is not vlaid \n\n")
+            return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST) 
+        print("\n\n serilizer is vlaid and before save  \n\n")           
         serializer_response = serializer.save()
         serializer_response = add_JWT_token_for_user_in_response_from_serializer(serializer_response)
         
+        print("\n\n  before sending the response  \n\n")           
         print(serializer_response,"----00")
         
         return Response(serializer_response)
