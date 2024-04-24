@@ -91,7 +91,7 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
         if not serializer.is_valid():
             return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST)            
         serializer_response = serializer.save()
-        add_JWT_token_for_user_in_response_from_serializer(serializer_response)
+        serializer_response = add_JWT_token_for_user_in_response_from_serializer(serializer_response)
         
         print(serializer_response,"----00")
         
