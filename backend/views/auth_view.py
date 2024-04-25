@@ -89,6 +89,7 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
     def post(self, request, *args, **kwargs):
         if os.getenv("GOOGLE_CLIENT_ID") == None or os.getenv("GOOGLE_CLIENT_ID") == "":
             print("\n\n ------==from view client id can't be found==------ \n\n")
+        print(f"\n\n client id --->>  {os.getenv("GOOGLE_CLIENT_ID")} \n\n")
         print("\n\n in the function before getting started \n\n")
         print(f"\n\n request object {request.data}  \n\n")
         
