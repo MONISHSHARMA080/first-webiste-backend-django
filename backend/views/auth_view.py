@@ -87,6 +87,8 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
     
     def post(self, request, *args, **kwargs):
         print("\n\n in the function before getting started \n\n")
+        print(f"\n\n request object {request.data}  \n\n")
+        
         serializer = self.get_serializer(data=request.data )
         if not serializer.is_valid():
             print("\n\n serilizer is not vlaid \n\n")
