@@ -287,6 +287,7 @@ def verify_google_token(id_token_from_frontend: str):
     try:
         # Specify the Google client ID for your app
         client_id = os.getenv("GOOGLE_CLIENT_ID")
+        print(client_id , "<<---== client id")
 
         if client_id is None or len(client_id) < 2:
             print("\n\n\n '-------Error google client id is not provided ---------' \n\n\n")
