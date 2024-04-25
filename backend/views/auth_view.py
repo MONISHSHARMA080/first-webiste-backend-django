@@ -93,7 +93,9 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
             return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST) 
         print("\n\n serilizer is vlaid and before save  \n\n")           
         serializer_response = serializer.save()
+        print("\n\n response from create method --",serializer_response,"\n\n")
         serializer_response = add_JWT_token_for_user_in_response_from_serializer(serializer_response)
+        print("\n\n response after JWT  --",serializer_response,"\n\n")
         
         print("\n\n  before sending the response  \n\n")           
         print(serializer_response,"----00")
