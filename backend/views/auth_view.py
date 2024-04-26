@@ -89,7 +89,8 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
     def post(self, request, *args, **kwargs):
         if os.getenv("GOOGLE_CLIENT_ID") == None or os.getenv("GOOGLE_CLIENT_ID") == "":
             print("\n\n ------==from view client id can't be found==------ \n\n")
-        print(f"\n\n client id --->>  {os.getenv("GOOGLE_CLIENT_ID")} \n\n")
+        id = os.getenv("GOOGLE_CLIENT_ID")
+        print(f"\n\n client id --->>  {id} \n\n")
         print("\n\n in the function before getting started \n\n")
         print(f"\n\n request object {request.data}  \n\n")
         
@@ -130,7 +131,9 @@ class user_signup_by_spotify(mixins.CreateModelMixin, generics.GenericAPIView):
     
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data )
+        print("\n\n from  spotify serilizer \n\n")
         if not serializer.is_valid():
+            print("spotify serilizer is not valid ")
             return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST) 
         response_from_create_func_in_serilizer  = serializer.save()
         print(response_from_create_func_in_serilizer,"----from spotify serilizer")
