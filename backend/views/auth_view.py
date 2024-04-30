@@ -182,6 +182,9 @@ def add_JWT_token_for_user_in_response_from_serializer(serializer_response):
     """also adding check , if resp. from seri. is 200 do  if else return the object itself """
     
     if serializer_response.get('status') == 200 or serializer_response.get('status') == 201 :
+        # ---------
+        # making sure that even if google returns the 
+        # ----------
         user = User_in_app.objects.get(email=serializer_response.get('user').get('email'))
         refresh = RefreshToken.for_user(user)
         serializer_response["tokens"] = {

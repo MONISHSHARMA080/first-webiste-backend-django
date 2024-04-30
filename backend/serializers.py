@@ -257,7 +257,7 @@ def return_already_existing_user_from_db_in_IntegrityError_of_unique_field(valid
                 "email_verified": existing_user.email_verified,
                 "verified_through_auth_provider": existing_user.verified_through_auth_provider,
                 "email": existing_user.email,
-                "name": existing_user.username
+                "username": existing_user.username
                 }
             }
     
