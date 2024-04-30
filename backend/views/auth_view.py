@@ -1,6 +1,7 @@
 import os
+from django.dispatch import Signal, receiver
 from rest_framework.response import Response
-from backend.models import User_in_app
+from backend.models import User_in_app, logs_from_django
 from backend.serializers import *
 # from backend.serializers import Email_login_user_serializer, Email_signup_usewr_serializer, Spotify_signup_user_serializer, View_all_users_serializer, user_serializer,verify_user_through_otp
 from rest_framework import mixins
@@ -103,12 +104,13 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
         print("\n\n response from create method --",serializer_response,"\n\n")
         serializer_response = add_JWT_token_for_user_in_response_from_serializer(serializer_response)
         print("\n\n response after JWT  --",serializer_response,"\n\n")
-        
+        user_created_create_temp_dir_in_next_js.send(sender=self.__class__,user_name= serializer_response.get('user').get('username')  )
         print("\n\n  before sending the response  \n\n")           
         print(serializer_response,"----00")
-        
+
         return Response(serializer_response)
     
+
     def get(self, request, *args, **kwargs):
         print("hh---")
         users = User_in_app.objects.all()
@@ -189,3 +191,20 @@ def add_JWT_token_for_user_in_response_from_serializer(serializer_response):
         return serializer_response
     else:
         return serializer_response
+    
+
+
+# ----------signals -----------
+
+user_created_create_temp_dir_in_next_js = Signal()
+
+
+@receiver(signal=user_created_create_temp_dir_in_next_js)
+def create_temp_dir_for_newly_created_user(sender,user_name,**kwargs):
+    print(user_name,"user name from user func")
+    response = requests.get(os.getenv('NEXT_BACKEND_URL')+f"/api/new_user_created_make_name_and_trial_dir?user_name={user_name}")
+    print(response.content,"response content")
+    if response.status_code != 200 or response.status_code != 201:
+        from_the_request = str(f"Response status code: {response.status_code}, Content: {response.content}")
+        logs_from_django.objects.create(log_string={"from_the_request":from_the_request,"user_name":user_name})
+    

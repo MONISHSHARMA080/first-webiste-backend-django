@@ -34,7 +34,9 @@ class User_in_app(AbstractUser):
     user_permissions = models.ManyToManyField(Permission, related_name='magical_website_user_permissions')
     
     
-   
+class logs_from_django(models.Model):
+    log_string = models.CharField(max_length=4000,blank=True, null=True)
+
 
     
     # def __str__(self):
