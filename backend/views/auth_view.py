@@ -122,9 +122,7 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
         users = self.get_queryset()
         users.delete()
         return Response( status=204)
-    
-    
- 
+
     
 class user_signup_by_spotify(mixins.CreateModelMixin, generics.GenericAPIView):
     

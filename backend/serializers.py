@@ -1,7 +1,11 @@
+import os
 import pyotp
 from rest_framework import serializers,status
+
+# from backend.views.views import verify_google_token
+from google.oauth2 import id_token
+from google.auth.transport import requests as Request_from_google_lib
 from .models import User_in_app 
-from .views.views import verify_google_token 
 # password hashing --
 from django.contrib.auth.hashers import make_password
 import requests
@@ -11,6 +15,15 @@ from django.core.mail import send_mail
 from first_website.settings import EMAIL_HOST_USER
 from django.utils import timezone
 
+class temp_website_generation_serializer(serializers.ModelSerializer):
+    # user_name = serializers.CharField()
+    prompt = serializers.CharField()
+    class Meta:
+        model = User_in_app
+        fields = [
+            # 'user_name',
+                  'prompt'
+                  ]
 # ---temp
 class View_all_users_serializer(serializers.ModelSerializer):
     class Meta:
@@ -233,8 +246,29 @@ class Spotify_signup_user_serializer(serializers.ModelSerializer):
         
         
 # auth helper function----------------
+def verify_google_token(id_token_from_frontend: str):
+    try:
+        # Specify the Google client ID for your app
+        client_id = os.getenv("GOOGLE_CLIENT_ID")
+        print(client_id , "<<---== client id")
+
+        if client_id is None or len(client_id) < 2:
+            print("\n\n\n '-------Error google client id is not provided ---------' \n\n\n")
+            return 500, "We are unable to reach out to Google for auth"
+
+        # Verify the token
+        id_info = id_token.verify_oauth2_token(id_token_from_frontend, Request_from_google_lib.Request(), client_id)
+
+        # Return the verification status or user information
+        id_info['status'] = 200
+        return id_info
+    except Exception as e:
+        # Token is invalid
+        return {"status":400 , "exception": str(e)}
+    
 def verify_google_token_view(request_object):
         id_token_from_frontend = request_object
+        print(f"id -token from the frontend -->>{id_token_from_frontend}")
         
 
         if not id_token_from_frontend:
@@ -242,6 +276,7 @@ def verify_google_token_view(request_object):
 
         # Calling the verify_google_token function
         response_from_google_auth_function = verify_google_token(id_token_from_frontend)
+        print("response from the google auth func ->>",response_from_google_auth_function)
         
         return  response_from_google_auth_function
 

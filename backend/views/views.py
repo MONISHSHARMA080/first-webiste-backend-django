@@ -8,13 +8,40 @@ import re
 # import google.generativeai as genai
 import os
 
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.response import Response
+from rest_framework import mixins
+from rest_framework import generics
+from rest_framework import status
+
+
 # Load environment variables from .env file
 import requests
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
+from backend.serializers import temp_website_generation_serializer
+
 load_dotenv()
 
+class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
+    
+    # queryset = User_in_app.objects.all()
+    serializer_class = temp_website_generation_serializer
+    # permission_classes = [IsAuthenticated]
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data )
+        if not serializer.is_valid():
+            return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST)
+        prompt = serializer.data.get('prompt')
+        print(f"\n\n\n {prompt}  \n\n\n")
+        # user = serializer.data.get('prompt')
+        # AccessToken.for_user()
+
+        # ----give a input to talk_to_llm(prompt) ; make the logic for handing the-->> return  from the check_if_llm_response_is_correct()
+
+        return Response({"aa":"notjing"})
 
 def response_from_llm(request):
     
@@ -134,7 +161,8 @@ def talk_to_llm(request):
             }
         ],
         model="mixtral-8x7b-32768",
-        # model="llama2-70b-4096",
+        # model="llama2-70b-4096"llama3-70b-8192,
+        # model="llama3-70b-8192",
         # model="gemma-7b-It",
     )
     print(chat_completion.choices[0].message.content)
