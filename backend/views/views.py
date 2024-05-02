@@ -1,22 +1,22 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.http import JsonResponse
 import os
 from groq import Groq
 from dotenv import load_dotenv
-import re
 # import google.generativeai as genai
 import os
+# import json
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework import mixins
 from rest_framework import generics
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 
 # Load environment variables from .env file
-import requests
+import requests as requests_normal
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
@@ -30,18 +30,33 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
     serializer_class = temp_website_generation_serializer
     # permission_classes = [IsAuthenticated]
     
+    # ----------
+    # -->> change the nane to hash of email and and name
+    # ---------
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data )
         if not serializer.is_valid():
             return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST)
-        prompt = serializer.data.get('prompt')
-        print(f"\n\n\n {prompt}  \n\n\n")
-        # user = serializer.data.get('prompt')
-        # AccessToken.for_user()
-
+        prompt_by_user = serializer.data.get('prompt')
+        # print(f"\n\n\n Dominic dicoco {request.user.email} \n\n\n")
+        
+        # user = request.user.username    # --||------- remember to un-comment it -----||---
+        
+        user = "Monish"
+        response_form_llm =talk_to_llm(prompt_by_user)
+        response_from_next = requests_normal.post(
+            # ------?>>>>>mf you did not included api in the path!!!!----->>>>>
+            os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?user_name={user}"
+                                                  , json={'message': 'Hello from Django',"response_form_llm":response_form_llm}
+                                                #   ,params={'user_namedkbdwkcbewjbcewjb': user}
+                                                  , headers={'content-type': 'application/json',}
+                                                          )
+        print(f"\n\n response from next status code  {response_from_next.status_code},,\n\n response ->{response_from_next} \n\n,content -->{response_from_next.content} \n\n error ->{str(response_from_next._content)} ")
+        print("\n\n",os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?user_name={user}")
         # ----give a input to talk_to_llm(prompt) ; make the logic for handing the-->> return  from the check_if_llm_response_is_correct()
-
-        return Response({"aa":"notjing"})
+        if response_from_next.status_code == 200:
+            return Response({"message_to_display_user":"website successfully created","status":"200"},status=status.HTTP_200_OK)
+        return Response({"message_to_display_user":"website was not  successfully created","status":"100"},status=status.HTTP_100_CONTINUE)
 
 def response_from_llm(request):
     
@@ -100,9 +115,7 @@ def response_from_llm(request):
     
 def check_if_llm_response_is_correct(react_file:str):
     
-    print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
-    print(react_file)
-    print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
+    
     
     client = Groq(
         api_key=os.getenv('GROQ_LLM_API_SECERET_KEY'),
@@ -131,7 +144,7 @@ def check_if_llm_response_is_correct(react_file:str):
 
 
 
-def talk_to_llm(request):
+def talk_to_llm(prompt_by_user:str):
     
     
     # role_for_system="You’re a site creator that responds(I expect your responses to be a  JSON object and that only )\n(it will have a field called app and it will contain React code )\n(in it backtick will be use at the end of the code and at the start of it , but  nowhere/not in between ! Do not dissappoint me or do anything else such as including backticks before or after json object , you will only return a json object thats it ;and also remember to close it too ;and don't inclue backticks in start of the  response with ``` json , instead start directly with the json object containing code  ) with React code that will impress any user in terms of design and looks. \n your signature style is adding colors(or custom touch) on everything in the site that includes button(that are rounded and stylish), background and a bit of gradient and animation on events,and the  the website as a whole , based on the user-provided input. All content and the UI-Ux(design) of the website should be as impressive and exciting as possible , fell free to add a bit of gradient and animation of events. I have my App.tsx file where i have a root component called app, i will paste your response in that ,you will export it in default(meaning in your response have the app component and default export it ), if need more component create it in the same file itself (down), and use tailwind for styling(do not use App.css) , other than that don't import any libraries.If user requests you for anything else(such as asking a general question , etc. that does not include you providing/making/writing  react code in response shut up and do not respond to the question;) , You will retun a response stating 'I am not ment for doing that ' and close the conversation by not responding to users question(or stop responding) with anything else. "
@@ -157,7 +170,7 @@ def talk_to_llm(request):
             },
             {
                 "role": "user",
-                "content": "Create website with many pages for a GYM that is on the way to create a revolution  ; give us a very  dope looking website that has too many colors as i ma trying to target the younger generation that like colors and photos and futuristic and modernly colorful, with animations ",
+                "content": prompt_by_user,
             }
         ],
         model="mixtral-8x7b-32768",
@@ -167,12 +180,19 @@ def talk_to_llm(request):
     )
     print(chat_completion.choices[0].message.content)
     print("-------------------------")
-    check_if_llm_response_is_correct(extract_tsx_code(chat_completion.choices[0].message.content))
+    code_for_next = extract_tsx_code(chat_completion.choices[0].message.content)
+    # if_response_is_correct = check_if_llm_response_is_correct(code_for_next)
+    # print("=--=-==-=p==00-0-00-9-889-8jnih",if_response_is_correct)
+    print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
+    print(code_for_next)
+    print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
+    # res = requests_normal.post(os.getenv('NEXT_BACKEND_URL')+"/store_llm_response_in_trial_dir")
+    
     # b = extract_html(chat_completion.choices[0].message.content)
     # write_html_file(b,'a.html')
     # write_html_file(extract_css(chat_completion.choices[0].message.content),'styles.css')
     
-    return HttpResponse(chat_completion.choices[0].message.content)
+    return code_for_next
 
 
 
