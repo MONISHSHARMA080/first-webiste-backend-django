@@ -55,8 +55,8 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
         print("\n\n",os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?user_name={user}")
         # ----give a input to talk_to_llm(prompt) ; make the logic for handing the-->> return  from the check_if_llm_response_is_correct()
         if response_from_next.status_code == 200:
-            return Response({"message_to_display_user":"website successfully created","status":"200"},status=status.HTTP_200_OK)
-        return Response({"message_to_display_user":"website was not  successfully created","status":"100"},status=status.HTTP_100_CONTINUE)
+            return Response({"message_to_display_user":"website successfully created","status":"200"},status=status.HTTP_304_NOT_MODIFIED)
+        return Response({"message_to_display_user":"website was not  successfully created","status":"100"},status=status.HTTP_200_OK)
 
 def response_from_llm(request):
     
