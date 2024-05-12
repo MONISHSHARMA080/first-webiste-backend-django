@@ -28,12 +28,13 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
     
     # queryset = User_in_app.objects.all()
     serializer_class = temp_website_generation_serializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     
     # ----------
     # -->> change the nane to hash of email and and name
     # ---------
     def post(self, request, *args, **kwargs):
+        print(f"\n\n----------request headers --->>>{request.headers}, \n user ->{request.user}")
         serializer = self.get_serializer(data=request.data )
         if not serializer.is_valid():
             return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST)
@@ -43,7 +44,8 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
         # user = request.user.username    # --||------- remember to un-comment it -----||---
         
         user = "Monish"
-        response_form_llm =talk_to_llm(prompt_by_user)
+        # response_form_llm =talk_to_llm(prompt_by_user)
+        response_form_llm ="talk_to_llm(prompt_by_user)"
         response_from_next = requests_normal.post(
             # ------?>>>>>mf you did not included api in the path!!!!----->>>>>
             os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?user_name={user}"
@@ -54,8 +56,8 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
         print(f"\n\n response from next status code  {response_from_next.status_code},,\n\n response ->{response_from_next} \n\n,content -->{response_from_next.content} \n\n error ->{str(response_from_next._content)} ")
         print("\n\n",os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?user_name={user}")
         # ----give a input to talk_to_llm(prompt) ; make the logic for handing the-->> return  from the check_if_llm_response_is_correct()
-        if response_from_next.status_code == 200:
-            return Response({"message_to_display_user":"website successfully created","status":"200"},status=status.HTTP_304_NOT_MODIFIED)
+        # if response_from_next.status_code == 200:
+        #     return Response({"message_to_display_user":"website successfully created","status":"200"},status=status.HTTP_304_NOT_MODIFIED)
         return Response({"message_to_display_user":"website was not  successfully created","status":"100"},status=status.HTTP_200_OK)
 
 def response_from_llm(request):
