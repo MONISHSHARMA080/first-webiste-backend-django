@@ -37,6 +37,7 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
     # -->> change the nane to hash of email and and name
     # ---------
     def post(self, request, *args, **kwargs):
+        #  expected error --- 400 405(method not allowed) 
         print(f"\n\n----------request headers --->>>{request.headers}, \n user ->{request.user}")
         serializer = self.get_serializer(data=request.data )
         if not serializer.is_valid():
@@ -52,16 +53,20 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
         response_from_next = requests_normal.post(
             # ------?>>>>>mf you did not included api in the path!!!!----->>>>>
             # os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?user_name={user}"
-            os.getenv('NEXT_BACKEND_URL')+f"/store_llm_response_in_trial_dir"
-                                                  , json={'message': 'Hello from Django',"response_form_llm":response_form_llm}
+            os.getenv('NEXT_BACKEND_URL')+f"/llm_response_write_it_in_temp_dir?userName={user}"
+                                                  , json={'message': 'Hello from Django',"llm_response":response_form_llm}
                                                 #   ,params={'user_namedkbdwkcbewjbcewjb': user}
                                                   , headers={'content-type': 'application/json',}
                                                           )
-        print(f"\n\n response from next status code  {response_from_next.status_code},,\n\n response ->{response_from_next} \n\n,content -->{response_from_next.content} \n\n error ->{str(response_from_next._content)} ")
-        print("\n\n",os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?user_name={user}")
+        print(f"\n\n response from next status code  {response_from_next.status_code},,\n\n response ->{response_from_next} \n\n,content -->{response_from_next.content} \n\n ")
+        print("\n\n",os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?userName={user}")
         # ----give a input to talk_to_llm(prompt) ; make the logic for handing the-->> return  from the check_if_llm_response_is_correct()
-        if response_from_next.status_code == 200:
+        if response_from_next.status_code != 200 and response_from_next.status_code != 201  : # and cause we need to if one is false both are  
+            print(f"\n -->>{ response_from_next.status_code != 200 }, \n ===---== {response_from_next.status_code != 201  } \n\n -0-00-00-0=0 {response_from_next.status_code != 200 or response_from_next.status_code != 201} \n\n 00000----00000 {response_from_next.status_code != 200 and response_from_next.status_code != 201} " )
             return Response({"message_to_display_user":"website successfully created","status":"200"},status=status.HTTP_304_NOT_MODIFIED)
+            # --------------- or probally 500----------------------------------------- #
+            # ------------------------------------------------- Handle errors here -------------------
+            # return Response({"message_to_displ ay_user":"website successfully created","status":"200"},status=status.HTTP_304_NOT_MODIFIED)
         return Response({"message_to_display_user":"website was not  successfully created","aaaa":"=-=-==-response_form_llm-=-=-=","status":"indierfiiiiii------------------------------------||-------------------000000000000iiiiiiiiiiiiiiiiiiiiiiiiiirw"},status=status.HTTP_200_OK)
 
 def response_from_llm(request):
@@ -165,11 +170,12 @@ def talk_to_llm(prompt_by_user:str):
     
     
     role_for_system=''' 
-    You are tasked with developing a SvelteKit code generator that takes a website prompt from the user and generates code for a single-page website. The generated code will be contained in a file named "+page.svelte". If the user wants to create multiple components, they should be advised to write them in the single file.
-
-    You will choose a web design theme (minimalism , material ,retro web,OrganicFlow, FuturaTech, ArtDeco ,ZenMinimal 
- design just to to name a few ) The generated website should adhere to a the chosen design theme , ensuring a cohesive visual identity and a good look. Additionally, it should incorporate animations to enhance user experience. The website should occupy the full screen and implement common features like multiple links(here i mean buttons etc. in the component , make in in your componet ) if the user hasn't specified otherwise.
-    
+    You are tasked with developing a SvelteKit code generator that takes a website prompt from the user and generates code for a website. The generated code will be contained in a single file named "+page.svelte". For adding multiple components write them in the bottom of the same file (same file do not add import statements, or make a new file).
+    You will choose a web design theme ( for eg ->minimalism , material ui  ,retro web,OrganicFlow, FuturaTech, ArtDeco ,ZenMinimal, rounded) 
+    . The generated website should adhere to a the chosen design theme , ensuring a cohesive visual identity and a good look. Additionally, it should incorporate animations on transition and initial page load etc
+    The website should occupy the full screen and implement common features like multiple links(here i mean buttons etc. in the component , make in in your componet ) if the user hasn't specified otherwise.
+    In your response as soon your json object ends , stop responding , i do not need your description of how to use the code etc, just give me the damm code thats it .
+    Do not use JS reservered jeywords for varaible names ; do not make multiple script tags , just use one 
     '''
     # role_for_system=''' You are a webDesigner filled with innovative design that is colorful and filled with animations and great UI \n .
     # You will provide  me with sveltekit code that I can paste in the file \n
@@ -202,7 +208,7 @@ def talk_to_llm(prompt_by_user:str):
             }
         ],
         # model="mixtral-8x7b-32768",
-        # model="llama2-70b-4096"llama3-70b-8192,
+        # model="llama3-70b-8192",
         model="llama3-70b-8192",
         # model="gemma-7b-It",
     )
