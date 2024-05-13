@@ -20,29 +20,66 @@ import requests as requests_normal
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
+from backend.models import logs_from_django
 from backend.serializers import temp_website_generation_serializer
 from django.views.decorators.csrf import csrf_exempt
 
 load_dotenv()
+
+class delete_a_project_or_temp(mixins.CreateModelMixin, generics.GenericAPIView):
+    
+    # queryset = User_in_app.objects.all()
+    serializer_class = temp_website_generation_serializer # sure you can change it but why not just continue
+    permission_classes = [IsAuthenticated]
+    queryset = logs_from_django
+    
+    # /delete_a_project
+    
+    def post(self, request, *args, **kwargs):
+        # handle the response form go backend her e --, see what to return user
+        #  it returns  200 ,--ok no worry , 400 , 500-- set the response in the db and in 400 and 500 show the user response_for_the_user
+        #  and these fucntions are just here to return the error to the user---
+        # in RN -->> check what the  status is and log it for not , next show the user the  error (alert)
+        # ---, 405 too but don't worry we are already posting
+        print("-=-=--==--=--=-=--request.query_params.get('project_name')=--==-- ")
+        project_name = request.query_params.get('project_name')
+        if project_name == None:
+            return Response({"message_for_the_user":"The project name can't be empty","status_code":400},status=status.HTTP_400_BAD_REQUEST)
+            
+        print(request.query_params.get('project_name') )
+        w = requests_normal.delete(
+             os.getenv('NEXT_BACKEND_URL')+f"/delete_a_project?userName={request.user.username}&project_name={project_name}"
+                                                  , headers={'content-type': 'application/json',}
+                                                          )
+        response_in_json = w.json()
+        print(response_in_json)
+        return Response({"message_for_the_user":response_in_json.get('message_for_the_user'),"status_code":response_in_json.get('status_code')},status=status.HTTP_200_OK)
 
 class temp_website_to_production(mixins.CreateModelMixin, generics.GenericAPIView):
     
     # queryset = User_in_app.objects.all()
     serializer_class = temp_website_generation_serializer
     permission_classes = [IsAuthenticated]
+    queryset = logs_from_django
     
     def post(self, request, *args, **kwargs):
-        # response_from_next = requests_normal.post(
-            # ------?>>>>>mf you did not included api in the path!!!!----->>>>>
-            # os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?user_name={user}"
+        # handle the response form go backend here --, see what to return user
+        #  it returns  200 ,--ok no worry , 400 , 500-- set the response in the db and in 400 and 500 show the user response_for_the_user
+        #  and these fucntions are just here to return the error to the user---
+        # in RN -->> check what the  status is and log it for not , next show the user the  error (alert)
+        # ---, 405 too but don't worry we are already posting
         print("-=-=--==--=--=-=--request.query_params.get('project_name')=--==-- ")
         print(request.query_params.get('project_name') )
+        project_name = request.query_params.get('project_name')
+        if project_name == None:
+            return Response({"message_for_the_user":"The project name can't be empty","status_code":400},status=status.HTTP_400_BAD_REQUEST)
         w = requests_normal.post(
-             os.getenv('NEXT_BACKEND_URL')+f"/host_the_temp_one_in_a_production_site?userName={request.user.username}&project_name={request.query_params.get('project_name') }"
+             os.getenv('NEXT_BACKEND_URL')+f"/host_the_temp_one_in_a_production_site?userName={request.user.username}&project_name={project_name}"
                                                   , headers={'content-type': 'application/json',}
                                                           )
-        print("\n status code -->",w.status_code, "\n\n contentn-->>",w.content)
-        return Response({"message_to_display_user":"website was not  successfully created","aaaa":"=-=-==-response_form_llm-=-=-=","status":"indierfiiiiii------------------------------------||-------------------000000000000iiiiiiiiiiiiiiiiiiiiiiiiiirw"},status=status.HTTP_200_OK)
+        response_in_json = w.json()
+        # print("\n status code -->",w.status_code, "\n\n contentn-->>",w.content, "w.get",)
+        return Response({"message_for_the_user":response_in_json.get('message_for_the_user'),"status_code":response_in_json.get('status_code')},status=status.HTTP_200_OK)
 
 class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
     
