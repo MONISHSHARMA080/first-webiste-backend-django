@@ -25,17 +25,34 @@ from django.views.decorators.csrf import csrf_exempt
 
 load_dotenv()
 
+class temp_website_to_production(mixins.CreateModelMixin, generics.GenericAPIView):
+    
+    # queryset = User_in_app.objects.all()
+    serializer_class = temp_website_generation_serializer
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, *args, **kwargs):
+        # response_from_next = requests_normal.post(
+            # ------?>>>>>mf you did not included api in the path!!!!----->>>>>
+            # os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?user_name={user}"
+        print("-=-=--==--=--=-=--request.query_params.get('project_name')=--==-- ")
+        print(request.query_params.get('project_name') )
+        w = requests_normal.post(
+             os.getenv('NEXT_BACKEND_URL')+f"/host_the_temp_one_in_a_production_site?userName={request.user.username}&project_name={request.query_params.get('project_name') }"
+                                                  , headers={'content-type': 'application/json',}
+                                                          )
+        print("\n status code -->",w.status_code, "\n\n contentn-->>",w.content)
+        return Response({"message_to_display_user":"website was not  successfully created","aaaa":"=-=-==-response_form_llm-=-=-=","status":"indierfiiiiii------------------------------------||-------------------000000000000iiiiiiiiiiiiiiiiiiiiiiiiiirw"},status=status.HTTP_200_OK)
+
 class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
     
     # queryset = User_in_app.objects.all()
     serializer_class = temp_website_generation_serializer
     permission_classes = [IsAuthenticated]
     
-    def get(self, request, *args, **kwargs):
-            return Response({"message_to_display_user":"website was not  successfully created","aaaa":"response_form_llm","status":"100"},status=status.HTTP_200_OK)
-    # ----------
+    # ---------------------------------------------------------|||||||||||
     # -->> change the nane to hash of email and and name
-    # ---------
+    # ---------------------------------------------------------|||||||||||
     def post(self, request, *args, **kwargs):
         #  expected error --- 400 405(method not allowed) 
         print(f"\n\n----------request headers --->>>{request.headers}, \n user ->{request.user}")

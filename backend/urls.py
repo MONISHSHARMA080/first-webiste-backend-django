@@ -24,5 +24,6 @@ urlpatterns = [
     path('signup/otp', auth_view.verify_user_through_otp.as_view() ),  
     path('llm', views.response_from_llm, name='response_from_llm'),  
     path('temp_website', views.temp_website_generation.as_view() ), 
+    path('temp_website_to_production', views.temp_website_to_production.as_view() ), 
     path('verify', views.verify_google_token, name='verify_google_token'),  # TF try to remove it 
 ]
