@@ -21,6 +21,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 
 from backend.serializers import temp_website_generation_serializer
+from django.views.decorators.csrf import csrf_exempt
 
 load_dotenv()
 
@@ -30,6 +31,8 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
     serializer_class = temp_website_generation_serializer
     permission_classes = [IsAuthenticated]
     
+    def get(self, request, *args, **kwargs):
+            return Response({"message_to_display_user":"website was not  successfully created","aaaa":"response_form_llm","status":"100"},status=status.HTTP_200_OK)
     # ----------
     # -->> change the nane to hash of email and and name
     # ---------
@@ -41,14 +44,15 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
         prompt_by_user = serializer.data.get('prompt')
         # print(f"\n\n\n Dominic dicoco {request.user.email} \n\n\n")
         
-        # user = request.user.username    # --||------- remember to un-comment it -----||---
+        user = request.user.username    # --||------- remember to un-comment it -----||---
         
-        user = "Monish"
-        # response_form_llm =talk_to_llm(prompt_by_user)
-        response_form_llm ="talk_to_llm(prompt_by_user)"
+        # user = "Monish"
+        response_form_llm =talk_to_llm(prompt_by_user)
+        # response_form_llm ="talk_to_llm(prompt_by_user)"
         response_from_next = requests_normal.post(
             # ------?>>>>>mf you did not included api in the path!!!!----->>>>>
-            os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?user_name={user}"
+            # os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?user_name={user}"
+            os.getenv('NEXT_BACKEND_URL')+f"/store_llm_response_in_trial_dir"
                                                   , json={'message': 'Hello from Django',"response_form_llm":response_form_llm}
                                                 #   ,params={'user_namedkbdwkcbewjbcewjb': user}
                                                   , headers={'content-type': 'application/json',}
@@ -56,9 +60,9 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
         print(f"\n\n response from next status code  {response_from_next.status_code},,\n\n response ->{response_from_next} \n\n,content -->{response_from_next.content} \n\n error ->{str(response_from_next._content)} ")
         print("\n\n",os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?user_name={user}")
         # ----give a input to talk_to_llm(prompt) ; make the logic for handing the-->> return  from the check_if_llm_response_is_correct()
-        # if response_from_next.status_code == 200:
-        #     return Response({"message_to_display_user":"website successfully created","status":"200"},status=status.HTTP_304_NOT_MODIFIED)
-        return Response({"message_to_display_user":"website was not  successfully created","status":"100"},status=status.HTTP_200_OK)
+        if response_from_next.status_code == 200:
+            return Response({"message_to_display_user":"website successfully created","status":"200"},status=status.HTTP_304_NOT_MODIFIED)
+        return Response({"message_to_display_user":"website was not  successfully created","aaaa":"=-=-==-response_form_llm-=-=-=","status":"indierfiiiiii------------------------------------||-------------------000000000000iiiiiiiiiiiiiiiiiiiiiiiiiirw"},status=status.HTTP_200_OK)
 
 def response_from_llm(request):
     
@@ -126,7 +130,14 @@ def check_if_llm_response_is_correct(react_file:str):
         messages=[
             {
                 "role": "system",
-                "content": "You are a senior software engineer that specialises in React, typescript and next.js.\n you  review my react code and tell me if it is wrong to paste in a file . \n I am going to put the code in a nextjs file so i need you to check it for me \n.First thing i need you to do is check if the component is valid syntax wise(check if any unnecessary strings , comma, is syntax for a react component , etc.), if not then it is not valid.\n Secondly check if this has use of library other than tailwind (like react-router ,etc.), if yes then that IS WRONG.\n .Thirdly ,is there a component that is exported by default , if not then thas is wrong \n Forth thing is , does this code has/is a react component , if not it is false \n. Fifth  are all the imports defined (examples can be use stare etc).\n Sixth an array of react components should be false as i can't paste it in file directly  \n .I need your response to be a JSON , i will have a field called success which will contain boolean value, if all the things afre flase then make it false else if everything is true return true. \n Your response will only return the JSON object as output on basis of the previously mentioned conditions , do not produce any other text "
+                "content": '''You are a senior software engineer that specialises in React, typescript and next.js.\n 
+                you  review my react code and tell me if it is wrong to paste in a file .
+                \n I am going to put the code in a nextjs file so i need you to check it for me \n.
+                First thing i need you to do is check if the component is valid syntax wise(check if any unnecessary strings , comma, is
+                syntax for a react component , etc.), if not then it is not valid.\n
+                Secondly check if this has use of library other than tailwind (like react-router ,etc.), if yes then that IS WRONG.\n 
+                Thirdly ,is there a component that is exported by default , if not then thas is wrong \n
+                Forth thing is , does this code has/is a react component , if not it is false \n. Fifth  are all the imports defined (examples can be use stare etc).\n Sixth an array of react components should be false as i can't paste it in file directly  \n .I need your response to be a JSON , i will have a field called success which will contain boolean value, if all the things afre flase then make it false else if everything is true return true. \n Your response will only return the JSON object as output on basis of the previously mentioned conditions , do not produce any other text\n your design will have a base color and make other colores around it \n your design will have a theme , wether it is minimalism , material design and retro design ,etc and you will stick to it .\n    '''
             },
             {
                 "role": "user",
@@ -153,7 +164,22 @@ def talk_to_llm(prompt_by_user:str):
     # role_for_system="You are a Senior Designer filled with innovative design that is colorful and filled with animation .Try to make website longer and detailed (eg about contacts etc) if the user has not mentioned about what make it by yourself \n  .You  responds(I expect your responses to be a  JSON object and that only )\n(it will have a field called app and it will contain React code )\n(in it backtick will be use at the end of the code and at the start of it , but  nowhere/not in between ! Do not dissappoint me or do anything else such as including backticks before or after json object , you will only return a json object thats it ;and also remember to close it too ;and don't inclue backticks in start of the  response with ``` json , instead start directly with the json object containing code  ) with React code that will impress any user in terms of design and looks. \n your signature style is adding colors(or custom touch) on everything in the site that includes button(that are rounded and stylish), background and a bit of gradient and animation on events,and the  the website as a whole , based on the user-provided input. All content and the UI-Ux(design) of the website should be as impressive and exciting as possible , fell free to add a bit of gradient and animation of events. I have my App.tsx file where i have a root component called app, i will paste your response in that ,you will export it in default(meaning in your response have the app component and default export it ), if need more component create it in the same file itself (down), and use tailwind for styling(do not use App.css) \n  other than that don't import any libraries.If user requests you for anything else(such as asking a general question , etc. that does not include you providing/making/writing  react code in response shut up and do not respond to the question;) , You will retun a response stating 'I am not ment for doing that ' and close the conversation by not responding to users question(or stop responding) with anything else. "
     
     
-    role_for_system=" You are a Senior Designer filled with innovative design that is colorful and filled with animations and responsive design\n . You will provide  me with react code that I can paste in the file \n try making it with multiple components in the same file (use hooks but do not use react router for anything)  .\n . You will write React code that uses Tailwind  for styling \n .Do not use any external library other that tailwind in my react app\n . All css will be in the form of tailwind \n I have my App.tsx file where I have a root component called app, i will paste your response in that ,you will export it in default(meaning it should have a component that is exported by default export it), if need more component create it in the same file itself (down), and use tailwind for styling(do not use App.css)  \n You can only respond with valid JavaScript objects or arrays. Do not respond with any other text or formatting around the JavaScript, you must only respond with raw JSON \n .I NEED your JSON response to be in the format where starting key is called app .\n in your response the app field will contain the  file , then i will copy and paste the file to my component so make no mistake.\n You will give me React code "
+    role_for_system=''' 
+    You are tasked with developing a SvelteKit code generator that takes a website prompt from the user and generates code for a single-page website. The generated code will be contained in a file named "+page.svelte". If the user wants to create multiple components, they should be advised to write them in the single file.
+
+    You will choose a web design theme (minimalism , material ,retro web,OrganicFlow, FuturaTech, ArtDeco ,ZenMinimal 
+ design just to to name a few ) The generated website should adhere to a the chosen design theme , ensuring a cohesive visual identity and a good look. Additionally, it should incorporate animations to enhance user experience. The website should occupy the full screen and implement common features like multiple links(here i mean buttons etc. in the component , make in in your componet ) if the user hasn't specified otherwise.
+    
+    '''
+    # role_for_system=''' You are a webDesigner filled with innovative design that is colorful and filled with animations and great UI \n .
+    # You will provide  me with sveltekit code that I can paste in the file \n
+    # try making it with multiple components in the same file .\n
+    # .Do not use any external library \n .
+    # All css will be in the form of native css  and also close the style tag  \n 
+    # I will paste you code in +page.svelte file , if need more component create it in the same file itself (down) \n
+    # You can only respond with valid JavaScript objects. Do not respond with any other text or formatting around the JavaScript,
+    # you must only respond with raw JSON \n .I NEED your JSON response to be in the format where starting key is called app and inside it write my code  .\n in your response the app field will contain the  file , then i will copy and paste the file to my component so make no mistake. \n also do not add weird paranthesis in your response  '''
+    # role_for_system=" You are a Senior Designer filled with innovative design that is colorful and filled with animations and responsive design and gereat UI(specially rount and full) \n . You will provide  me with sveltekit code that I can paste in the file \n try making it with multiple components in the same file .\n . You will write sveltekit code that uses Tailwind  for styling \n .Do not use any external library other that tailwind in my react app\n . All css will be in the form of tailwind \n I have my App.tsx file where I have a root component called app, i will paste your response in that ,you will export it in default(meaning it should have a component that is exported by default export it), if need more component create it in the same file itself (down), and use tailwind for styling(do not use App.css)  \n You can only respond with valid JavaScript objects or arrays. Do not respond with any other text or formatting around the JavaScript, you must only respond with raw JSON \n .I NEED your JSON response to be in the format where starting key is called app .\n in your response the app field will contain the  file , then i will copy and paste the file to my component so make no mistake.\n You will give me React code "
     # role_for_system="You are a code assistant that is designed only for helping users to create a long website that has great  design and animations you will  be using  react ,I have my App.tsx file where i have a root component called app, i will paste your response in that ,you will export it in default, if need more component create it in the same file itself (down), and use tailwind for styling(do not use App.css) , other than that don't import any libraries. In genreal your design  will be expressive (with many colors and many animations) joyful and modern with big icons, buttons etc. If user requests you for anything else(such as asking a general question , etc. that does not include you providing/making/writing  react code in response shut up and do not respond to the question;) , You will retun a response stating 'I am not ment for doing that ' and close the conversation by not responding to users question(or stop responding) with anything else. You can only respond with valid JavaScript objects or arrays. Do not respond with any other text or formatting around the JavaScript, you must only respond with raw JavaScript. The current date is Friday, March 29, 2024"
     # role_for_system = 'You are a site creator that responds with typescript code for a react component that will go in a single file that has a fragment and is the root component called App, based on user provided input. The design of website that you will produce should be creative(in therms of design , layout and style) , impressive(in therms of color choices), colorful(more than 1 color) ,modern and unique , the user should be impressed from your design skills , you will not install any library   '
     # role_for_system= 'You are a site layout creator that responds with HTML ,CSS and JS file which will be used to make the sections  of a page on a website, based on the user-provided input. All content should be as impressive ,colorful(shold be ,modern like after 2018) and as exciting as possible(it should look as it is from 2019-2023) . Your Job is to create staitc website using HTML ,CSS and JS (by yourself , user will not add anything later, and also give html css and js file by yourself meaning do not ask user to add things in the  to html css and js file it is your responsiblity to write its content  ) (if user asks you to create the designs (in HTML, CSS , and Js) then You will make it beautiful, exiciting , novel, unique) ; in your response the contents of css file should start with ":css:" followed by contnent of css and  end with ":css:" and contents of javascript file should also start and end with ":js:" , if user requests you for anything else(such as asking a general question , etc. that does not include you providing/making/writing  code in html , css and javascript in response shut up and do not respond to the question  ) , You will retun a response stating "I am not ment for doing that " and close the conversation by not responding to users question(or stop responding) with anything else . the css and js file that you will provide me will start from css: and js: respectively and end with :css and :js '
@@ -175,9 +201,9 @@ def talk_to_llm(prompt_by_user:str):
                 "content": prompt_by_user,
             }
         ],
-        model="mixtral-8x7b-32768",
+        # model="mixtral-8x7b-32768",
         # model="llama2-70b-4096"llama3-70b-8192,
-        # model="llama3-70b-8192",
+        model="llama3-70b-8192",
         # model="gemma-7b-It",
     )
     print(chat_completion.choices[0].message.content)
@@ -200,13 +226,13 @@ def talk_to_llm(prompt_by_user:str):
 
 
 def extract_tsx_code(code_block:str):
-    start_index = code_block.find("import") 
+    start_index = code_block.find("<") 
     print(start_index,"jnecjnwje")
     # start_backtick_index = code_block.find("`", start_index)
     start_backtick_index = start_index -1
 
     # Find the last backtick
-    end_backtick_index = code_block.find("``", start_backtick_index + 1)
+    end_backtick_index = code_block.find("`}", start_backtick_index + 1)
     # end_backtick_index = code_block.rfind("`")
     # end_backtick_index = code_block.rfind(">);}")
 
