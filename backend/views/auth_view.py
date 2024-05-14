@@ -104,7 +104,7 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
         print("\n\n response from create method --",serializer_response,"\n\n")
         serializer_response = add_JWT_token_for_user_in_response_from_serializer(serializer_response)
         print("\n\n response after JWT  --",serializer_response,"\n\n")
-        user_created_create_temp_dir_in_next_js.send(sender=self.__class__,user_name= serializer_response.get('user').get('username')  )
+        user_created_create_temp_dir_in_sevelte_and_go.send(sender=self.__class__,user_name= serializer_response.get('user').get('username')  )
         print("\n\n  before sending the response  \n\n")           
         print(serializer_response,"----00")
 
@@ -138,6 +138,7 @@ class user_signup_by_spotify(mixins.CreateModelMixin, generics.GenericAPIView):
         response_from_create_func_in_serilizer  = serializer.save()
         print(response_from_create_func_in_serilizer,"----from spotify serilizer")
         response_from_create_func_in_serilizer = add_JWT_token_for_user_in_response_from_serializer(response_from_create_func_in_serilizer)
+        user_created_create_temp_dir_in_sevelte_and_go.send(sender=self.__class__,user_name= response_from_create_func_in_serilizer.get('user').get('username')  )
         return Response(response_from_create_func_in_serilizer) 
     
 class verify_user_through_otp(mixins.CreateModelMixin, generics.GenericAPIView):
@@ -197,13 +198,13 @@ def add_JWT_token_for_user_in_response_from_serializer(serializer_response):
 
 # ----------signals -----------
 
-user_created_create_temp_dir_in_next_js = Signal()
+user_created_create_temp_dir_in_sevelte_and_go = Signal()
 
 
-@receiver(signal=user_created_create_temp_dir_in_next_js)
+@receiver(signal=user_created_create_temp_dir_in_sevelte_and_go)
 def create_temp_dir_for_newly_created_user(sender,user_name,**kwargs):
     print(user_name,"user name from user func")
-    response = requests.get(os.getenv('NEXT_BACKEND_URL')+f"/api/new_user_created_make_name_and_trial_dir?user_name={user_name}")
+    response = requests.post(os.getenv('NEXT_BACKEND_URL')+f"/create_temp_and_name_dir_for_user?userName={user_name}")
     print(response.content,"response content")
     if response.status_code != 200 or response.status_code != 201:
         from_the_request = str(f"Response status code: {response.status_code}, Content: {response.content}")
