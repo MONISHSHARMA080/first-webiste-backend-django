@@ -209,4 +209,4 @@ def create_temp_dir_for_newly_created_user(sender,user_name,**kwargs):
     if response.status_code != 200 or response.status_code != 201:
         from_the_request = str(f"Response status code: {response.status_code}, Content: {response.content}")
         logs_from_django.objects.create(log_string={"from_the_request":from_the_request,"user_name":user_name})
-    
+                

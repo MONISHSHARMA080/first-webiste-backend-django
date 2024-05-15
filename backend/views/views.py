@@ -26,6 +26,21 @@ from django.views.decorators.csrf import csrf_exempt
 
 load_dotenv()
 
+class get_all_the_projects_of_the_user(mixins.CreateModelMixin,generics.GenericAPIView):
+    serializer_class = temp_website_generation_serializer # sure you can change it but why not just continue
+    permission_classes = [IsAuthenticated]
+    queryset = logs_from_django
+    
+    def post(self, request, *args, **kwargs):
+        w = requests_normal.get(
+             os.getenv('NEXT_BACKEND_URL')+f"/get_all_the_projects_of_the_user?userName={request.user.username}"
+                                                  , headers={'content-type': 'application/json',}
+                                                          )
+        print(f"\n\n output from the go lang-->>{w.content} \n\n ")
+        response_in_json = w.json()
+        return Response({"message_for_the_user":response_in_json.get('message_for_the_user'),"status_code":response_in_json.get('status_code'),"values":response_in_json.get('values')},status=status.HTTP_200_OK)
+        
+
 class delete_a_project_or_temp(mixins.CreateModelMixin, generics.GenericAPIView):
     
     # queryset = User_in_app.objects.all()
