@@ -27,5 +27,6 @@ urlpatterns = [
     path('temp_website_to_production', views.temp_website_to_production.as_view() ), 
     path('delete_a_project_or_temp', views.delete_a_project_or_temp.as_view() ), 
     path('get_all_the_projects_of_the_user', views.get_all_the_projects_of_the_user.as_view() ), 
+    path('get_the_name_for_the_project', views.get_the_name_for_the_project.as_view() ), 
     path('verify', views.verify_google_token, name='verify_google_token'),  # TF try to remove it 
 ]
