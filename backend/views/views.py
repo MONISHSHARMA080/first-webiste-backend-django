@@ -27,11 +27,18 @@ from django.views.decorators.csrf import csrf_exempt
 load_dotenv()
 
 class get_the_name_for_the_project(mixins.CreateModelMixin,generics.GenericAPIView):
+    
     serializer_class = temp_website_generation_serializer # sure you can change it but why not just continue
     # permission_classes = [IsAuthenticated]
     queryset = logs_from_django
     
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
+        
+        serializer = self.get_serializer(data=request.data) 
+        
+        if not serializer.is_valid():
+            return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST)
+        prompt = serializer.data.get('prompt')
         
         client = Groq(
             api_key=os.getenv('GROQ_LLM_API_SECERET_KEY'),
@@ -51,10 +58,10 @@ class get_the_name_for_the_project(mixins.CreateModelMixin,generics.GenericAPIVi
                 },
                 {
                     "role": "user",
-                    "content": ''' 
-                    a website for a shop owner that that sells jwellery , but make it  material design with extreme curves that 
-                    has its own personality  and make the colors(bg and all) as posh as possible (meaning play with  golds silver(these were examples , make your own combination for sure) with unique buttons ,bg and animations that aims to sell it to 1% (wealth wise) ) , we will be selling it to a luxury brand 
-                    ''',
+                    "content": prompt
+                    # a website for a shop owner that that sells jwellery , but make it  material design with extreme curves that 
+                    # has its own personality  and make the colors(bg and all) as posh as possible (meaning play with  golds silver(these were examples , make your own combination for sure) with unique buttons ,bg and animations that aims to sell it to 1% (wealth wise) ) , we will be selling it to a luxury brand 
+                    # ''',
                 }
             ],
             # model="mixtral-8x7b-32768",

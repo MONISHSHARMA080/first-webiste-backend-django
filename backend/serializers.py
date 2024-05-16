@@ -15,6 +15,15 @@ from django.core.mail import send_mail
 from first_website.settings import EMAIL_HOST_USER
 from django.utils import timezone
 
+class get_the_name_for_the_project(serializers.ModelSerializer):
+    # user_name = serializers.CharField()
+    prompt = serializers.CharField()
+    class Meta:
+        model = User_in_app
+        fields = [
+            # 'user_name',
+                  'prompt'
+                  ]
 class temp_website_to_production_serializer(serializers.ModelSerializer):
     # user_name = serializers.CharField()
     prompt = serializers.CharField()
