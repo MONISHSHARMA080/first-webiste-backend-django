@@ -33,7 +33,6 @@ class get_the_name_for_the_project(mixins.CreateModelMixin,generics.GenericAPIVi
     queryset = logs_from_django
     
     def post(self, request, *args, **kwargs):
-        
         serializer = self.get_serializer(data=request.data) 
         
         if not serializer.is_valid():
