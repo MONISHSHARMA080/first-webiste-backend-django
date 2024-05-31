@@ -178,7 +178,8 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
         print("\n\n",os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?userName={user}")
         # ----give a input to talk_to_llm(prompt) ; make the logic for handing the-->> return  from the check_if_llm_response_is_correct()
         response_from_go_in_json = response_from_go.json()
-        return Response({"message_to_display_user":response_from_go_in_json.get('message_for_the_user'),"status_code":response_from_go_in_json.get('status_code'), "link_for_the_current_site":response_from_go_in_json.get("link_for_the_current_site")},status=status.HTTP_200_OK)
+        return Response({"message_to_display_user":response_from_go_in_json.get('message_for_the_user'),"status_code":response_from_go_in_json.get('status_code'), 
+                         "prompt":prompt_by_user,"link_for_the_current_site":response_from_go_in_json.get("link_for_the_current_site")},status=status.HTTP_200_OK)
 
 def response_from_llm(request):
     
