@@ -122,7 +122,10 @@ class user_serializer(serializers.ModelSerializer):
             validated_data['email_verified'] = response_from_google_auth_function.get('email_verified', '')  
             validated_data['verified_through_auth_provider'] = response_from_google_auth_function.get('email_verified', '')    
             try :
-                super().create(validated_data)
+                # super().create(validated_data)
+                user = User_in_app.objects.create(**validated_data)
+                # print('user object in the serilizers.py', user, "---", user.id)
+                validated_data["id"] = user.id
             except IntegrityError as e: 
                 if 'UNIQUE constraint' in str(e):
                     # if the user already exists just return it from there 
@@ -242,7 +245,9 @@ class Spotify_signup_user_serializer(serializers.ModelSerializer):
                 validated_data['email_verified'] = 'True' # as we are using spotify's api
                 validated_data['verified_through_auth_provider'] = 'True'
                 try :
-                    super().create(validated_data)
+                    # super().create(validated_data)
+                    user = User_in_app.objects.create(**validated_data)
+                    validated_data['id'] = user.id
                 except IntegrityError as e: 
                     if 'UNIQUE constraint' in str(e):
                     # if the user already exists just return it from there 
@@ -311,7 +316,8 @@ def return_already_existing_user_from_db_in_IntegrityError_of_unique_field(valid
                 "email_verified": existing_user.email_verified,
                 "verified_through_auth_provider": existing_user.verified_through_auth_provider,
                 "email": existing_user.email,
-                "username": existing_user.username
+                "username": existing_user.username,
+                "id":existing_user.id
                 }
             }
     
