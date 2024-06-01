@@ -104,7 +104,7 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
         print("\n\n response from create method --",serializer_response,"\n\n")
         serializer_response = add_JWT_token_for_user_in_response_from_serializer(serializer_response)
         print("\n\n response after JWT  --",serializer_response,"\n\n")
-        user_created_create_temp_dir_in_sevelte_and_go.send(sender=self.__class__,user_name= serializer_response.get('user').get('username') + str(serializer_response.get('user').get('id'))  )
+        user_created_create_temp_dir_in_sevelte_and_go.send(sender=self.__class__,user_name= serializer_response.get('user').get('username').replace(" ","") + str(serializer_response.get('user').get('id'))  )
         print("\n\n  before sending the response  \n\n")           
         print(serializer_response,"----00")
 
@@ -138,11 +138,11 @@ class user_signup_by_spotify(mixins.CreateModelMixin, generics.GenericAPIView):
         response_from_create_func_in_serilizer  = serializer.save()
         print(response_from_create_func_in_serilizer,"----from spotify serilizer")
         response_from_create_func_in_serilizer = add_JWT_token_for_user_in_response_from_serializer(response_from_create_func_in_serilizer)
-        user_created_create_temp_dir_in_sevelte_and_go.send(sender=self.__class__,user_name= response_from_create_func_in_serilizer.get('user').get('username')+str(serializer_response.get('user').get('id'))  )
+        user_created_create_temp_dir_in_sevelte_and_go.send(sender=self.__class__,user_name= response_from_create_func_in_serilizer.get('user').get('username').replace(" ","")+str(response_from_create_func_in_serilizer.get('user').get('id'))  )
         return Response(response_from_create_func_in_serilizer) 
     
-class verify_user_through_otp(mixins.CreateModelMixin, generics.GenericAPIView):
     
+class verify_user_through_otp(mixins.CreateModelMixin, generics.GenericAPIView):
     queryset = User_in_app.objects.all()
     serializer_class = verify_user_through_otp
     
@@ -184,6 +184,8 @@ def add_JWT_token_for_user_in_response_from_serializer(serializer_response):
         # ---------
         # making sure that even if google returns the 
         # ----------
+        print(serializer_response.get('user').get('email'),"-- email fromt the add_JWT_token_for_user_in_response_from_serializer ")
+        print("\n\n ===",serializer_response,"\n",serializer_response.get('user').get('email'),"-- email fromt the add_JWT_token_for_user_in_response_from_serializer ")
         user = User_in_app.objects.get(email=serializer_response.get('user').get('email'))
         refresh = RefreshToken.for_user(user)
         serializer_response["tokens"] = {

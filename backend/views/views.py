@@ -81,9 +81,9 @@ class get_all_the_projects_of_the_user(mixins.CreateModelMixin,generics.GenericA
     
     def post(self, request, *args, **kwargs):
         w = requests_normal.get(
-             os.getenv('NEXT_BACKEND_URL')+f"/get_all_the_projects_of_the_user?userName={request.user.username+str(request.user.id)}"
-                                                  , headers={'content-type': 'application/json',}
-                                                          )
+            os.getenv('NEXT_BACKEND_URL') + f"/get_all_the_projects_of_the_user?userName={request.user.username.replace(' ', '') + str(request.user.id)}",
+            headers={'content-type': 'application/json'}
+        )
         print(f"\n\n output from the go lang-->>{w.content} \n\n ")
         response_in_json = w.json()
         return Response({"message_for_the_user":response_in_json.get('message_for_the_user'),"status_code":response_in_json.get('status_code'),"values":response_in_json.get('values')},status=status.HTTP_200_OK)
@@ -111,9 +111,9 @@ class delete_a_project_or_temp(mixins.CreateModelMixin, generics.GenericAPIView)
             
         print(request.query_params.get('project_name') )
         w = requests_normal.delete(
-             os.getenv('NEXT_BACKEND_URL')+f"/delete_a_project?userName={request.user.username+str(request.user.id)}&project_name={project_name}"
-                                                  , headers={'content-type': 'application/json',}
-                                                          )
+        os.getenv('NEXT_BACKEND_URL') + f"/delete_a_project?userName={request.user.username.replace(' ', '') + str(request.user.id)}&project_name={project_name}",
+        headers={'content-type': 'application/json'}
+        )
         response_in_json = w.json()
         print(response_in_json)
         return Response({"message_for_the_user":response_in_json.get('message_for_the_user'),"status_code":response_in_json.get('status_code')},status=status.HTTP_200_OK)
@@ -136,9 +136,8 @@ class temp_website_to_production(mixins.CreateModelMixin, generics.GenericAPIVie
         if project_name == None:
             return Response({"message_for_the_user":"The project name can't be empty","status_code":400},status=status.HTTP_400_BAD_REQUEST)
         w = requests_normal.post(
-             os.getenv('NEXT_BACKEND_URL')+f"/host_the_temp_one_in_a_production_site?userName={request.user.username+str(request.user.id)}&project_name={project_name}"
-                                                  , headers={'content-type': 'application/json',}
-                                                          )
+             os.getenv('NEXT_BACKEND_URL')+f"/host_the_temp_one_in_a_production_site?userName={request.user.username.replace(' ','')+str(request.user.id)}&project_name={project_name}",
+                                                  headers={'content-type': 'application/json',}  )
         response_in_json = w.json()
         print("\n status code -->",response_in_json)
         return Response({"message_for_the_user":response_in_json.get('message_for_the_user'),"status_code":response_in_json.get('status_code'), "link_for_the_current_site":response_in_json.get("link_for_the_current_site")},status=status.HTTP_200_OK)
@@ -161,7 +160,7 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
         prompt_by_user = serializer.data.get('prompt')
         # print(f"\n\n\n Dominic dicoco {request.user.email} \n\n\n")
         
-        user = request.user.username+str(request.user.id)    # --||------- remember to un-comment it -----||---
+        user = request.user.username.replace(' ','')+str(request.user.id)    # --||------- remember to un-comment it -----||---
         
         # user = "Monish"
         response_form_llm =talk_to_llm(prompt_by_user)

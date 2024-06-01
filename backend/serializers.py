@@ -248,6 +248,7 @@ class Spotify_signup_user_serializer(serializers.ModelSerializer):
                     # super().create(validated_data)
                     user = User_in_app.objects.create(**validated_data)
                     validated_data['id'] = user.id
+                    print(" in the try block (end--)")
                 except IntegrityError as e: 
                     if 'UNIQUE constraint' in str(e):
                     # if the user already exists just return it from there 
@@ -259,6 +260,7 @@ class Spotify_signup_user_serializer(serializers.ModelSerializer):
                     validated_data['profile_picture_url'] = None
                 return {"status":status_code_to_send_in_response,"message_to_display_user": "Your email has been verified , welcome onboard","message":"You are now verified","user":validated_data }
             else:
+                print("\n what went wrong here in depth 2-->>", response_containing_user_details.content)
                 return {"status":response.status_code,"message_to_display_user": "We can't verify you ,Please retry or try a different auth provider  ","message":"error during spotify api depth 2","user":validated_data} 
 
         else:
@@ -309,6 +311,7 @@ def verify_google_token_view(request_object):
 def return_already_existing_user_from_db_in_IntegrityError_of_unique_field(validated_data):
     """ will return already existing user if user try to create account again"""
     existing_user = User_in_app.objects.get(email=validated_data['email'])
+    print( " in the  return_already_existing_user_from_db_in_IntegrityError_of_unique_field func", str(existing_user))
     return {
                 "status": 200,
                 "user":{
