@@ -177,7 +177,8 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
         print("\n\n",os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?userName={user}")
         # ----give a input to talk_to_llm(prompt) ; make the logic for handing the-->> return  from the check_if_llm_response_is_correct()
         response_from_go_in_json = response_from_go.json()
-        return Response({"message_to_display_user":response_from_go_in_json.get('message_for_the_user'),"status_code":response_from_go_in_json.get('status_code'), 
+        return Response({"message_to_display_user":response_from_go_in_json.get('message_for_the_user'),
+                        "status_code":response_from_go_in_json.get('status_code'), 
                          "prompt":prompt_by_user,"link_for_the_current_site":response_from_go_in_json.get("link_for_the_current_site")},status=status.HTTP_200_OK)
 
 def response_from_llm(request):
@@ -275,7 +276,7 @@ def check_if_llm_response_is_correct(react_file:str):
 
 def talk_to_llm(prompt_by_user:str):
     
-    
+    print("\n prompt from-- the user ",prompt_by_user)
     # role_for_system="You’re a site creator that responds(I expect your responses to be a  JSON object and that only )\n(it will have a field called app and it will contain React code )\n(in it backtick will be use at the end of the code and at the start of it , but  nowhere/not in between ! Do not dissappoint me or do anything else such as including backticks before or after json object , you will only return a json object thats it ;and also remember to close it too ;and don't inclue backticks in start of the  response with ``` json , instead start directly with the json object containing code  ) with React code that will impress any user in terms of design and looks. \n your signature style is adding colors(or custom touch) on everything in the site that includes button(that are rounded and stylish), background and a bit of gradient and animation on events,and the  the website as a whole , based on the user-provided input. All content and the UI-Ux(design) of the website should be as impressive and exciting as possible , fell free to add a bit of gradient and animation of events. I have my App.tsx file where i have a root component called app, i will paste your response in that ,you will export it in default(meaning in your response have the app component and default export it ), if need more component create it in the same file itself (down), and use tailwind for styling(do not use App.css) , other than that don't import any libraries.If user requests you for anything else(such as asking a general question , etc. that does not include you providing/making/writing  react code in response shut up and do not respond to the question;) , You will retun a response stating 'I am not ment for doing that ' and close the conversation by not responding to users question(or stop responding) with anything else. "
     # role_for_system="You are a Senior Designer filled with innovative design that is colorful and filled with animation .Try to make website longer and detailed (eg about contacts etc) if the user has not mentioned about what make it by yourself \n  .You  responds(I expect your responses to be a  JSON object and that only )\n(it will have a field called app and it will contain React code )\n(in it backtick will be use at the end of the code and at the start of it , but  nowhere/not in between ! Do not dissappoint me or do anything else such as including backticks before or after json object , you will only return a json object thats it ;and also remember to close it too ;and don't inclue backticks in start of the  response with ``` json , instead start directly with the json object containing code  ) with React code that will impress any user in terms of design and looks. \n your signature style is adding colors(or custom touch) on everything in the site that includes button(that are rounded and stylish), background and a bit of gradient and animation on events,and the  the website as a whole , based on the user-provided input. All content and the UI-Ux(design) of the website should be as impressive and exciting as possible , fell free to add a bit of gradient and animation of events. I have my App.tsx file where i have a root component called app, i will paste your response in that ,you will export it in default(meaning in your response have the app component and default export it ), if need more component create it in the same file itself (down), and use tailwind for styling(do not use App.css) \n  other than that don't import any libraries.If user requests you for anything else(such as asking a general question , etc. that does not include you providing/making/writing  react code in response shut up and do not respond to the question;) , You will retun a response stating 'I am not ment for doing that ' and close the conversation by not responding to users question(or stop responding) with anything else. "
     
@@ -323,7 +324,8 @@ def talk_to_llm(prompt_by_user:str):
         model="llama3-70b-8192",
         # model="gemma-7b-It",
     )
-    print(chat_completion.choices[0].message.content)
+    
+    print(chat_completion)
     print("-------------------------")
     code_for_next = extract_tsx_code(chat_completion.choices[0].message.content)
     # if_response_is_correct = check_if_llm_response_is_correct(code_for_next)

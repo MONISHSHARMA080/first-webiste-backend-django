@@ -217,8 +217,8 @@ class Spotify_signup_user_serializer(serializers.ModelSerializer):
         redirect_uri = 'magicalfirstwebsite://'
         
         grant_type = 'authorization_code'
-        client_id =  '812c827d57b44b2497941ccb210ae022'
-        client_secret = 'd2dabccf5df64a78bd88454de770ebc0'
+        client_id =  os.getenv('CLIENT_ID_SPOTIFY')
+        client_secret = os.getenv('CLIENT_SECRET_SPOTIFY')
         
         authorization_without_encoding = F"{client_id}:{client_secret}"
         authorization = base64.b64encode(authorization_without_encoding.encode()).decode()
