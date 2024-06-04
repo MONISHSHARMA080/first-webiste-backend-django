@@ -288,7 +288,7 @@ def talk_to_llm(prompt_by_user:str):
     . The generated website should adhere to a the chosen design theme , ensuring a visual identity ,a good look and well spaces elements(buttons, links, etc.) . Additionally, it should incorporate animations on transition and initial page load etc
     The website should occupy the full screen and implement common features like multiple links(here i mean buttons etc. in the component , make in in your componet ) if the user hasn't specified otherwise.
     In your response as soon your json object ends , stop responding , i do not need your description of how to use the code etc, just give me the damm code thats it .
-    Do not use JS reservered jeywords for varaible names ; do not make multiple script tags , just use one . \n  Make your site mobile friendly
+    Do not use JS reservered keywords for varaible names ; do not make multiple script tags , just use one . \n  Make your site mobile friendly
     '''
     # role_for_system=''' You are a webDesigner filled with innovative design that is colorful and filled with animations and great UI \n .
     # You will provide  me with sveltekit code that I can paste in the file \n
@@ -334,6 +334,9 @@ def talk_to_llm(prompt_by_user:str):
     print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
     print(code_for_next)
     print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
+    print("\n\n raw response -------->>>>>>>")
+    print(chat_completion.choices[0].message.content)
+    print("\n\n raw response -------->>>>>>>")
     # res = requests_normal.post(os.getenv('NEXT_BACKEND_URL')+"/store_llm_response_in_trial_dir")
     
     # b = extract_html(chat_completion.choices[0].message.content)
@@ -352,7 +355,7 @@ def extract_tsx_code(code_block:str):
     start_backtick_index = start_index -1
 
     # Find the last backtick
-    end_backtick_index = code_block.find("`}", start_backtick_index + 1)
+    end_backtick_index = code_block.find("```", start_backtick_index + 1)
     # end_backtick_index = code_block.rfind("`")
     # end_backtick_index = code_block.rfind(">);}")
 
