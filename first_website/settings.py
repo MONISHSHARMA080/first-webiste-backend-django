@@ -31,7 +31,10 @@ AUTH_USER_MODEL = "backend.User_in_app"
 SECRET_KEY = 'django-insecure-vx=&tyg22diyz5e-or9y2!35_lfnfynw7+h6f$frh6_ne#jg3g'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG',False)
+# DEBUG = os.getenv('DEBUG',False)
+# DEBUG = bool(os.getenv('DEBUG'))
+DEBUG = False
+
 
 # ALLOWED_HOSTS = ['social-network-monish.onrender.com' , '127.0.0.1']
 ALLOWED_HOSTS = ['*']
@@ -58,7 +61,7 @@ REST_FRAMEWORK = {
     },
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer', # remove this if you want to remove api doc in prod
+        # 'rest_framework.renderers.BrowsableAPIRenderer', # remove this if you want to remove api doc in prod
     ]
 }
 
