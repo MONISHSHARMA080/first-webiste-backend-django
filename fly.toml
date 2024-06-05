@@ -15,6 +15,7 @@ console_command = '/code/manage.py shell'
 [env]
   DEBUG = 'False'
   PORT = '8000'
+  NEXT_BACKEND_URL='https://generate-website.fly.dev:4697'
 
 [http_service]
   internal_port = 8000

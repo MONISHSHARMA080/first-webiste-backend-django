@@ -205,7 +205,7 @@ user_created_create_temp_dir_in_sevelte_and_go = Signal()
 
 @receiver(signal=user_created_create_temp_dir_in_sevelte_and_go)
 def create_temp_dir_for_newly_created_user(sender,user_name,**kwargs):
-    print(user_name,"user name from user func")
+    print(user_name,"user name from user func", " and the req to the go is ", os.getenv('NEXT_BACKEND_URL')+f"/create_temp_and_name_dir_for_user?userName={user_name}")
     response = requests.post(os.getenv('NEXT_BACKEND_URL')+f"/create_temp_and_name_dir_for_user?userName={user_name}")
     print(response.content,"response content")
     if response.status_code != 200 or response.status_code != 201:
