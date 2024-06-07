@@ -23,8 +23,22 @@ from google.auth.transport import requests
 from backend.models import logs_from_django
 from backend.serializers import temp_website_generation_serializer
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view
+from backend.models import User_in_app
 
 load_dotenv()
+
+@api_view(['GET'])
+def delete_user(request, email):
+    try:
+        user = User_in_app.objects.get(email=email)
+        username = user.username
+        user.delete()
+        print("req method", request.method)
+        return Response({'message': f'User {username} deleted successfully.'}, status=200)
+    except User_in_app.DoesNotExist:
+        return Response({'error': 'User not found.'}, status=404)
 
 class get_the_name_for_the_project(mixins.CreateModelMixin,generics.GenericAPIView):
     
