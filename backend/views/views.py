@@ -38,7 +38,7 @@ def delete_user(request, email):
         print("req method", request.method)
         return Response({'message': f'User {username} deleted successfully.'}, status=200)
     except User_in_app.DoesNotExist:
-        return Response({'error': 'User not found.'}, status=404)
+        return Response({'error': 'User not found.'}, status=400)
 
 class get_the_name_for_the_project(mixins.CreateModelMixin,generics.GenericAPIView):
     
