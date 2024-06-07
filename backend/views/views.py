@@ -29,16 +29,28 @@ from backend.models import User_in_app
 
 load_dotenv()
 
-@api_view(['GET'])
-def delete_user(request, email):
-    try:
-        user = User_in_app.objects.get(email=email)
-        username = user.username
-        user.delete()
-        print("req method", request.method)
-        return Response({'message': f'User {username} deleted successfully.'}, status=200)
-    except User_in_app.DoesNotExist:
-        return Response({'error': 'User not found.'}, status=400)
+
+
+class delete_user(mixins.CreateModelMixin,generics.GenericAPIView):
+    
+    serializer_class = temp_website_generation_serializer # sure you can change it but why not just continue
+    # permission_classes = [IsAuthenticated]
+    queryset = logs_from_django
+    
+    def post(self, request, email):
+        try:
+            user = User_in_app.objects.get(email=email)
+            username = user.username
+            user.delete()
+            print("req method", request.method)
+            return Response({'message': f'User {username} deleted successfully.'}, status=200)
+        except User_in_app.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=400)
+    
+    def get(self, request, email):
+        print("here")
+        return Response({'error': 'cool now make a post request here followed by your email, eg->generate-a-website.fly.dev/delete_me/your_email@gmail.com'}, status=200)
+
 
 class get_the_name_for_the_project(mixins.CreateModelMixin,generics.GenericAPIView):
     
