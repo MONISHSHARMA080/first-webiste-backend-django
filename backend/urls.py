@@ -19,6 +19,7 @@ urlpatterns = [
     
     path('signup/google', auth_view.User.as_view()  ),  
     path('delete_me/<str:email>/', views.delete_user.as_view(), name='delete_user'),
+    path('delete_user/<str:email>/', views.delete_user.as_view(), name='delete_user'),
     path('signup/email', auth_view.user_signup_by_email.as_view() ),  
     path('login/email', auth_view.user_login_by_email.as_view() ),  
     path('signup/spotify', auth_view.user_signup_by_spotify.as_view() ),  
