@@ -107,6 +107,7 @@ class get_all_the_projects_of_the_user(mixins.CreateModelMixin,generics.GenericA
     
     def post(self, request, *args, **kwargs):
         userName = request.user.username.replace(' ', '') + str(request.user.id)
+        print(" username in the get_all_the_projects_of_the_user  is ", userName)
         w = requests_normal.get(
             os.getenv('NEXT_BACKEND_URL') + f"/get_all_the_projects_of_the_user?userName={userName}",
             headers={'content-type': 'application/json'}
