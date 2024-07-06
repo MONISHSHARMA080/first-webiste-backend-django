@@ -114,6 +114,7 @@ class get_all_the_projects_of_the_user(mixins.CreateModelMixin,generics.GenericA
         )
         print(f"\n\n output from the go lang-->>{w.content} \n\n  values -->",response_in_json.get('values'))
         response_in_json = w.json()
+        print(f"\n\n w.json -->>", response_in_json)
         return Response({"message_for_the_user":response_in_json.get('message_for_the_user'),"status_code":response_in_json.get('status_code'),"values":response_in_json.get('values'), "User_Name":userName},status=status.HTTP_200_OK)
         
 
