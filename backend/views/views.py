@@ -108,14 +108,21 @@ class get_all_the_projects_of_the_user(mixins.CreateModelMixin,generics.GenericA
     def post(self, request, *args, **kwargs):
         userName = request.user.username.replace(' ', '') + str(request.user.id)
         print(" username in the get_all_the_projects_of_the_user  is ", userName)
-        w = requests_normal.get(
-            os.getenv('NEXT_BACKEND_URL') + f"/get_all_the_projects_of_the_user?userName={userName}",
-            headers={'content-type': 'application/json'}
-        )
-        print(f"\n\n output from the go lang-->>{w.content} \n\n  values -->",response_in_json.get('values'))
-        response_in_json = w.json()
-        print(f"\n\n w.json -->>", response_in_json)
-        return Response({"message_for_the_user":response_in_json.get('message_for_the_user'),"status_code":response_in_json.get('status_code'),"values":response_in_json.get('values'), "User_Name":userName},status=status.HTTP_200_OK)
+        try:
+            w = requests_normal.get(
+            os.getenv('NEXT_BACKEND_URL') + f"/get_all_the_projects_of_the_user?userName={userName}")
+            response_in_json = w.json()
+            print(f"\n\n output from the go lang-->>{w.content} \n\n  values -->", response_in_json.get('values'))
+            print(f"\n\n w.json -->>", response_in_json)
+        except requests.RequestException as e:
+            print(" cant run the request , error -->>", e)
+            response_returning = Response({"error": "Failed to fetch data from backend"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            print("respons ereturning in the get_all_the_projects_of_the_user ",response_returning)
+            return response_returning
+        response_returning = Response({"message_for_the_user":response_in_json.get('message_for_the_user'),"status_code":response_in_json.get('status_code'),"values":response_in_json.get(
+        'values'), "User_Name":userName},status=status.HTTP_200_OK)
+        print("respons ereturning in the get_all_the_projects_of_the_user ",response_returning)
+        return response_returning
         
 
 class delete_a_project_or_temp(mixins.CreateModelMixin, generics.GenericAPIView):
@@ -206,9 +213,11 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
         print("\n\n",os.getenv('NEXT_BACKEND_URL')+f"/api/store_llm_response_in_trial_dir?userName={user}")
         # ----give a input to talk_to_llm(prompt) ; make the logic for handing the-->> return  from the check_if_llm_response_is_correct()
         response_from_go_in_json = response_from_go.json()
-        return Response({"message_to_display_user":response_from_go_in_json.get('message_for_the_user'),
+        response_to_send  =Response({"message_to_display_user":response_from_go_in_json.get('message_for_the_user'),
                         "status_code":response_from_go_in_json.get('status_code'), 
                          "prompt":prompt_by_user,"link_for_the_current_site":response_from_go_in_json.get("link_for_the_current_site")},status=status.HTTP_200_OK)
+        print("response that i am sending in temp_website_generation-->",response_to_send)
+        return response_to_send
 
 def response_from_llm(request):
     

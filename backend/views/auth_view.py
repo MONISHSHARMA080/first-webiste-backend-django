@@ -18,6 +18,7 @@ from rest_framework.permissions import IsAuthenticated
 from backend.serializers import View_all_users_serializer
 from django.contrib.auth.hashers import check_password
 
+
 class user_login_by_email(mixins.CreateModelMixin, generics.GenericAPIView):
     
     queryset = User_in_app.objects.all()
@@ -104,6 +105,17 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
         print("\n\n response from create method --",serializer_response,"\n\n")
         serializer_response = add_JWT_token_for_user_in_response_from_serializer(serializer_response)
         print("\n\n response after JWT  --",serializer_response,"\n\n")
+        print("making a spam req at -->", os.getenv('NEXT_BACKEND_URL')+"/create_temp_and_name_dir_for_user?userName=dfjkn  "  )
+        try:
+            response = requests.get(f"{os.getenv('NEXT_BACKEND_URL')}/create_temp_and_name_dir_for_user?userName=dfjkn")
+            response.raise_for_status()
+            print(f"Response from Next.js backend: {response.text}")
+        except requests.RequestException as e:
+            print(f"Error making request to svelte  backend: {e}")
+            Response({"message_for_the_user ": " Got an error, Don't worry its on our side " },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        response = requests.get(os.getenv('NEXT_BACKEND_URL')+f"/create_temp_and_name_dir_for_user?userName=dfjkn",
+            headers={'content-type': 'application/json'})
+        print("response from the spam -->",response)
         user_created_create_temp_dir_in_sevelte_and_go.send(sender=self.__class__,user_name= serializer_response.get('user').get('username').replace(" ","") + str(serializer_response.get('user').get('id'))  )
         print("\n\n  before sending the response  \n\n")           
         print(serializer_response,"----00")
@@ -206,7 +218,9 @@ user_created_create_temp_dir_in_sevelte_and_go = Signal()
 @receiver(signal=user_created_create_temp_dir_in_sevelte_and_go)
 def create_temp_dir_for_newly_created_user(sender,user_name,**kwargs):
     print(user_name,"user name from user func", " and the req to the go is ", os.getenv('NEXT_BACKEND_URL')+f"/create_temp_and_name_dir_for_user?userName={user_name}")
-    response = requests.post(os.getenv('NEXT_BACKEND_URL')+f"/create_temp_and_name_dir_for_user?userName={user_name}")
+    response = requests.post(os.getenv('NEXT_BACKEND_URL')+f"/create_temp_and_name_dir_for_user?userName={user_name}",
+            headers={'content-type': 'application/json'})
+    print("response")
     print(response.content,"response content")
     if response.status_code != 200 or response.status_code != 201:
         from_the_request = str(f"Response status code: {response.status_code}, Content: {response.content}")
