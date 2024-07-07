@@ -124,7 +124,7 @@ class user_serializer(serializers.ModelSerializer):
             try :
                 # super().create(validated_data)
                 user = User_in_app.objects.create(**validated_data)
-                # print('user object in the serilizers.py', user, "---", user.id)
+                print('user object in the serilizers.py', user, "---", user.id)
                 validated_data["id"] = user.id
             except IntegrityError as e: 
                 if 'UNIQUE constraint' in str(e):

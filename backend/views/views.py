@@ -116,12 +116,18 @@ class get_all_the_projects_of_the_user(mixins.CreateModelMixin,generics.GenericA
             print(f"\n\n w.json -->>", response_in_json)
         except requests.RequestException as e:
             print(" cant run the request , error -->>", e)
-            response_returning = Response({"error": "Failed to fetch data from backend"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # cheacking if the this is what am i getting
+            response_returning = Response({"error": "Failed to fetch data from backend"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
             print("respons ereturning in the get_all_the_projects_of_the_user ",response_returning)
             return response_returning
-        response_returning = Response({"message_for_the_user":response_in_json.get('message_for_the_user'),"status_code":response_in_json.get('status_code'),"values":response_in_json.get(
-        'values'), "User_Name":userName},status=status.HTTP_200_OK)
-        print("respons ereturning in the get_all_the_projects_of_the_user ",response_returning)
+        response_data = {
+            "message_for_the_user": response_in_json.get('message_for_the_user'),
+            "status_code": response_in_json.get('status_code'),
+            "values": response_in_json.get('values'),
+            "User_Name": userName
+        }
+        response_returning = Response(response_data, status=status.HTTP_200_OK)
+        print("response returning in the get_all_the_projects_of_the_user", response_returning.data)
         return response_returning
         
 

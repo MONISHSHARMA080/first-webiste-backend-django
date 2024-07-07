@@ -8,8 +8,8 @@ services:
     ports:
       - "8000:8000"
     command: ["gunicorn", "--bind", ":8000", "--workers", "2", "first_website.wsgi"]
-    volumes:
-      - sqlite_data:/code/db
+#     volumes:
+#       - sqlite_data:/code/db
 
-volumes:
-  sqlite_data:
+# volumes:
+#   sqlite_data:

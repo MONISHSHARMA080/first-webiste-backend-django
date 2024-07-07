@@ -95,7 +95,6 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
         print(f"\n\n client id --->>  {id} \n\n")
         print("\n\n in the function before getting started \n\n")
         print(f"\n\n request object {request.data}  \n\n")
-        
         serializer = self.get_serializer(data=request.data )
         if not serializer.is_valid():
             print("\n\n serilizer is not vlaid \n\n")
@@ -105,18 +104,9 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
         print("\n\n response from create method --",serializer_response,"\n\n")
         serializer_response = add_JWT_token_for_user_in_response_from_serializer(serializer_response)
         print("\n\n response after JWT  --",serializer_response,"\n\n")
-        print("making a spam req at -->", os.getenv('NEXT_BACKEND_URL')+"/create_temp_and_name_dir_for_user?userName=dfjkn  "  )
-        try:
-            response = requests.get(f"{os.getenv('NEXT_BACKEND_URL')}/create_temp_and_name_dir_for_user?userName=dfjkn")
-            response.raise_for_status()
-            print(f"Response from Next.js backend: {response.text}")
-        except requests.RequestException as e:
-            print(f"Error making request to svelte  backend: {e}")
-            Response({"message_for_the_user ": " Got an error, Don't worry its on our side " },status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        response = requests.get(os.getenv('NEXT_BACKEND_URL')+f"/create_temp_and_name_dir_for_user?userName=dfjkn",
-            headers={'content-type': 'application/json'})
-        print("response from the spam -->",response)
-        user_created_create_temp_dir_in_sevelte_and_go.send(sender=self.__class__,user_name= serializer_response.get('user').get('username').replace(" ","") + str(serializer_response.get('user').get('id'))  )
+        user_id = User_in_app.objects.get(email=serializer_response.get('user').get('email')).id
+        print("\n\n\n\n\n\n\n\n user id in google auth is ",user_id, " in string", str(user_id))
+        user_created_create_temp_dir_in_sevelte_and_go.send(sender=self.__class__,user_name= serializer_response.get('user').get('username').replace(" ","") +str(user_id)  )
         print("\n\n  before sending the response  \n\n")           
         print(serializer_response,"----00")
 
