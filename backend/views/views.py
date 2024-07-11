@@ -101,7 +101,7 @@ class get_the_name_for_the_project(mixins.CreateModelMixin,generics.GenericAPIVi
 
 
 class get_all_the_projects_of_the_user(mixins.CreateModelMixin,generics.GenericAPIView):
-    serializer_class = temp_website_generation_serializer # sure you can change it but why not just continue
+    # serializer_class = temp_website_generation_serializer # sure you can change it but why not just continue
     permission_classes = [IsAuthenticated]
     queryset = logs_from_django
     
