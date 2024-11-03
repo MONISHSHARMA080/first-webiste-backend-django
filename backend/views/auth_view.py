@@ -114,10 +114,32 @@ class User(generics.GenericAPIView, mixins.ListModelMixin,mixins.DestroyModelMix
     
 
     def get(self, request, *args, **kwargs):
-        print("hh---")
-        users = User_in_app.objects.all()
-        serializer = View_all_users_serializer(users, many=True)
-        return Response(serializer.data)
+        print("Starting GET method in User view")
+    
+        try:
+            # Attempt to retrieve all users
+            print("Attempting to retrieve all users from User_in_app model")
+            users = User_in_app.objects.all()
+            print(f"Retrieved users: {users}")
+            
+            # Serialize the user data
+            print("Serializing user data")
+            serializer = View_all_users_serializer(users, many=True)
+            print(f"Serialized data: {serializer.data}")
+            
+            # Return serialized data in the response
+            print("Returning response with serialized user data")
+            return Response(serializer.data)
+        
+        except Exception as e:
+            # Log the error and state of relevant variables
+            print(f"An error occurred in GET method: {e}")
+            print("users variable state:", users if 'users' in locals() else "Not defined")
+            print("serializer variable state:", serializer if 'serializer' in locals() else "Not defined")
+            
+            # Return an error response
+            return Response({"error": "An error occurred while retrieving user data"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
     
     def delete(self, request, *args, **kwargs):
