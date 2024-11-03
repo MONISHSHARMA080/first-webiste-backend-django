@@ -1,0 +1,1 @@
+make the db on turso as it is free and easy and fast
