@@ -132,7 +132,12 @@ class user_serializer(serializers.ModelSerializer):
                 print("problem with saving the object in the db-->\n "+ str(e))
                 if 'UNIQUE constraint' in str(e):
                     # if the user already exists just return it from there 
-                    return return_already_existing_user_from_db_in_IntegrityError_of_unique_field(validated_data)                    
+                    return return_already_existing_user_from_db_in_IntegrityError_of_unique_field(validated_data)  
+            except Exception as e:
+                print("An unexpected error occurred in the try block:\n" + str(e))
+                # Optionally, log additional information about the exception
+                return {"status": 500, "message": "An unexpected error occurred"}
+
             return {"status":response_from_google_auth_function.get('status'),"user":validated_data}
    
 class View_all_users_serializer(serializers.ModelSerializer):
