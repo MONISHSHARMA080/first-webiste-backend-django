@@ -171,6 +171,7 @@ a = os.getenv('DB_ENGINE')
 b = os.getenv('DB_NAME')
 c = os.environ.get('DB_NAME')
 print(f"a is {a} \n\n b is {b} \n and c is {c}")
+print(dict(os.environ))
 
 # ------- using turs0 in gcp -----
 DATABASES = {
