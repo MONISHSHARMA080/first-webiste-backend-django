@@ -25,7 +25,7 @@ COPY . /code
 ENV SECRET_KEY "OfMuZxfGYLD8cZlQLUYZ2iLanBcLQipab3MYvxIVj5bbhlu6I9"
 
 # RUN python manage.py collectstatic --noinput
-RUN python manage.py makemigrations
-RUN python manage.py migrate
+# RUN python manage.py makemigrations
+# RUN python manage.py migrate
 EXPOSE 8000
 CMD ["gunicorn", "--bind", ":8000", "--workers", "2", "first_website.wsgi"]
