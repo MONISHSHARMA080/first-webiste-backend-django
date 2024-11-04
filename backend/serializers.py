@@ -129,6 +129,7 @@ class user_serializer(serializers.ModelSerializer):
                 print('user object in the serilizers.py', user, "---", user.id)
                 validated_data["id"] = user.id
             except IntegrityError as e: 
+                print("problem with saving the object in the db-->\n "+ str(e))
                 if 'UNIQUE constraint' in str(e):
                     # if the user already exists just return it from there 
                     return return_already_existing_user_from_db_in_IntegrityError_of_unique_field(validated_data)                    
