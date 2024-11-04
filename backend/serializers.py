@@ -110,10 +110,12 @@ class user_serializer(serializers.ModelSerializer):
          
         if response_from_google_auth_function.get('status') == 400:
             # if the response from the google system is a bad request we will warn user that your token is invalid and message from google auth
+            print("bad request in the serilizer")
             return {"status":400, "message":response_from_google_auth_function.get('exception') }
         #else if status is 200 
         elif response_from_google_auth_function.get('status') == 200:
             # fitting it in the model
+            print("the status is 200 in the user sterilizer")
             validated_data['username'] = response_from_google_auth_function.get('given_name')
             if validated_data['username'] =="": # why -> i am not sure if one of them m is empty or not  so just  to be safe    
                 validated_data['username'] = response_from_google_auth_function.get('name') 
