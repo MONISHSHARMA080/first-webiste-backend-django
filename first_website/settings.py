@@ -167,6 +167,10 @@ WSGI_APPLICATION = 'first_website.wsgi.application'
 #         'PORT': os.getenv('DB_PORT'),
 #     }
 # }
+a = os.getenv('DB_ENGINE')
+b = os.getenv('DB_NAME')
+print(f"a is {a} \n\n b is {b}")
+
 # ------- using turs0 in gcp -----
 DATABASES = {
     "default": {
