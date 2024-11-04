@@ -169,7 +169,8 @@ WSGI_APPLICATION = 'first_website.wsgi.application'
 # }
 a = os.getenv('DB_ENGINE')
 b = os.getenv('DB_NAME')
-print(f"a is {a} \n\n b is {b}")
+c = os.environ.get('DB_NAME')
+print(f"a is {a} \n\n b is {b} \n and c is {c}")
 
 # ------- using turs0 in gcp -----
 DATABASES = {
