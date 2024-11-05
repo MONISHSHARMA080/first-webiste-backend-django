@@ -198,6 +198,7 @@ class temp_website_generation(mixins.CreateModelMixin, generics.GenericAPIView):
         print(f"\n\n----------request headers --->>>{request.headers}, \n user ->{request.user}")
         serializer = self.get_serializer(data=request.data )
         if not serializer.is_valid():
+            print(" the serilizer is not valid in thetemp_website_generation ")
             return Response( serializer.data ,status=status.HTTP_400_BAD_REQUEST)
         prompt_by_user = serializer.data.get('prompt')
         # print(f"\n\n\n Dominic dicoco {request.user.email} \n\n\n")
