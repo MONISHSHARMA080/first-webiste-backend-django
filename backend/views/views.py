@@ -348,29 +348,32 @@ def talk_to_llm(prompt_by_user:str):
     # role_for_system= 'You are a site layout creator that responds with HTML ,CSS and JS file which will be used to make the sections  of a page on a website, based on the user-provided input. All content should be as impressive ,colorful(shold be ,modern like after 2018) and as exciting as possible(it should look as it is from 2019-2023) . Your Job is to create staitc website using HTML ,CSS and JS (by yourself , user will not add anything later, and also give html css and js file by yourself meaning do not ask user to add things in the  to html css and js file it is your responsiblity to write its content  ) (if user asks you to create the designs (in HTML, CSS , and Js) then You will make it beautiful, exiciting , novel, unique) ; in your response the contents of css file should start with ":css:" followed by contnent of css and  end with ":css:" and contents of javascript file should also start and end with ":js:" , if user requests you for anything else(such as asking a general question , etc. that does not include you providing/making/writing  code in html , css and javascript in response shut up and do not respond to the question  ) , You will retun a response stating "I am not ment for doing that " and close the conversation by not responding to users question(or stop responding) with anything else . the css and js file that you will provide me will start from css: and js: respectively and end with :css and :js '
     
     
-    
+    GROQ_LLM_API_SECERET_KEY = os.getenv('GROQ_LLM_API_SECERET_KEY')
+    print("GROQ_LLM_API_SECERET_KEY-->  "+GROQ_LLM_API_SECERET_KEY)
     client = Groq(
-        api_key=os.getenv('GROQ_LLM_API_SECERET_KEY'),
+        api_key=GROQ_LLM_API_SECERET_KEY,
     )
     print("--------about to send the message-----------")
-    chat_completion = client.chat.completions.create(
-        messages=[
-            {
-                "role": "system",
-                "content": role_for_system,
-            },
-            {
-                "role": "user",
-                "content": prompt_by_user,
-            }
-        ],
-        # model="mixtral-8x7b-32768",
-        # model="llama3-70b-8192",
-        model="llama3-70b-8192",
-        # model="gemma-7b-It",
-    )
-    
-    print(chat_completion)
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": role_for_system,
+                },
+                {
+                    "role": "user",
+                    "content": prompt_by_user,
+                }
+            ],
+            # model="mixtral-8x7b-32768",
+            # model="llama3-70b-8192",
+            model="llama3-70b-8192",
+            # model="gemma-7b-It",
+        )
+    except Exception as e:
+        print("exception occurred --> "+str(e))
+    print(str(chat_completion))
     print("-------------------------")
     code_for_next = extract_tsx_code(chat_completion.choices[0].message.content)
     # if_response_is_correct = check_if_llm_response_is_correct(code_for_next)
