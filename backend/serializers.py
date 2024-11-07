@@ -136,6 +136,9 @@ class user_serializer(serializers.ModelSerializer):
             except Exception as e:
                 print("An unexpected error occurred in the try block:\n" + str(e))
                 # Optionally, log additional information about the exception
+                a =  return_already_existing_user_from_db_in_IntegrityError_of_unique_field(validated_data)
+                print("the outpiut from the return_already_existing_user_from_db_in_IntegrityError_of_unique_field() is --> "+str(a)+"<<--\n\n" )
+                print("execption was ", e)
                 return  return_already_existing_user_from_db_in_IntegrityError_of_unique_field(validated_data)
 
             return {"status":response_from_google_auth_function.get('status'),"user":validated_data}
